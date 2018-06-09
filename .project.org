@@ -1,0 +1,101 @@
+* Agenda
+** Monday
+   - From 09:30 to 11:30
+     - Software development and agile methodologies
+     - How Scrum works
+     - Planning, user stories, business value and estimates
+   - From 11:30 to 12:30
+     - Project introduction
+     - What’s the goal of the project?
+     - Workshop: try to write user stories for the project
+     - Setup Trello to keep track of the project
+   - From 12:30 to 13:30
+     - Deploy a “Walking Skeleton” in production
+       - Fork the project ???
+       - Create an account on https://zeit.co
+       - Install now with ~$ npm install -g now~ and go through authentication process
+       - From the project root run  ~$ now~ and be amazed that everything works
+     - Look at the user stories
+     - Setup Trello to keep track of the user stories
+     - Look at the server APIs ???
+** Tuesday
+   - 9:30 create the teams with Pietro, look at the user stories and explain what we are going to do
+     - 4 iterations of 4 hours each: Tuesday morning, Wednesday morning, Thursday morning, Thursday evening
+     - Standup at the beginning of every iteration, one will talk for the whole group
+     - Deploy early, deploy often
+     - Pull request and code review
+     - Definition of done: must be approved by product owner
+     - Definition of done: must be approved by the tech leader ???
+     - Complete an user story before to start to work on another (minimize waste)
+     - Point of the game: release as much value as possible
+   - From 10:00 to 13:30
+     - Work on the project
+** Wednesday
+   - From 09:30 to 13:30
+     - Standup meeting
+     - Work on the project
+** Thursday
+   - From 09:30 to 13:30
+     - Standup meeting
+     - Work on the project
+   - From 14:30 to 18:30
+     - Standup meeting
+     - Work on the project
+** Friday
+   - From 9:30 to 10:30
+     - Demo: show everybody what you did
+   - From 10:30 to 12:30
+     - Retrospective
+   - From 12:30 to 13:30
+     - Closing remarks and considerations: what to expect next
+* Server Side [1/8]
+  - [X] Deploy hello world application on now
+  - [ ] Basic chat application with socket.io
+  - [ ] Run server side tests on Travis on deploy
+  - [ ] Run client side tests on Travis on deploy
+  - [ ] ???
+  - [ ] Create final repository ~codemaster-2018~ with an appropriate ~README.md~
+  - [ ] Fork the fork the repository and deploy it
+    - Does forking on Github create an upstream remote by default? If
+      no then put the instruction on ~README.md~ the students must be
+      able to pull and rebase on upstream in case of another future or
+      a bug fix.
+  - [ ] Emacs checking JSON syntax
+* Client Side
+** User Stories
+  - An user can enter anonymously
+  - An user can post messages
+  - An user can see posted messages
+  - An user can see who posted every message
+  - An user can enter with an username
+  - An user can see what’s his username
+  - An user can see who is connected to the same server
+  - An user can create another chat room with a name
+  - An user can see the list of available rooms
+  - An user can create a private chat room to chat with another user
+  - An user can create a private chat room and invite other users to chat
+  - An user can configure its avatar
+  - An user can tell if a room has unread messages
+  - An user can mention another user by prefixing his username with `@`
+  - An user can mention a topic by prefixing it with `#`
+  - An user will be notified if mentioned in a message
+  - An user will be notified if a topic of his interest is mentioned in a message
+  - An user will be notified if its username is used in a message
+  - An user will be notified when one of his friends comes online
+  - An user can mention another user selecting it from a list of users
+  - An user can mention a topic selecting it from a list of topics
+  - An user can mention everybody in a room by including in the message `@room` or `@everybody`
+  - An user can mention another room by prefixing the name of the room with `$`
+  - An user can use a private room available only to himself to experiment with all the platform features
+  - An user can render one or more word in bold surrounding it with `*`
+  - An user can render one or more word in italic surrounding it with `_`
+  - An user can render one or more word in strike surrounding it with `~`
+  - An user can render one or more word as code surrounding it with backticks
+  - An user can post multiline messages
+  - An user can render one or more lines as code surrounding it with triple backticks
+  - An user can quote messages by prefixing it `>`
+  - An user can search for past messages
+  - An user can be seen from other users as “not available to chat”
+  - An user can use keyboard shortcuts to access common functionalities
+  - A message not yet sent by an user can survive a temporary network connection interruption
+  - A premium user can use messages like “@chiara!tay” (tay = Thinking About You) that will show beautiful effects on the recipient screen
