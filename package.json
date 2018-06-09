@@ -1,0 +1,14 @@
+{
+  "name": "purple-fury",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gabrielelana/purple-fury.git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "node server"
+  },
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
