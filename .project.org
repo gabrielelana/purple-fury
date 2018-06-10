@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [7/17]
+* Server Side [9/24]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -57,7 +57,16 @@
   - [X] Add ~client~ directory
   - [X] Login an user anonymously
   - [X] Login an user with username/password and lock that username
-  - [ ] Use login id to connect socket and bind the socket to the user
+  - [X] Rename ~id~ to ~token~
+  - [X] Use login token to connect socket and bind user token to the socket
+  - [ ] ~POST /messages~ send a message in a room || main room if not specified otherwise
+  - [ ] ~GET /messages~
+  - [ ] ~GET /users/{token}/messages~
+  - [ ] ~GET /room/{name}/messages~
+  - [ ] APIs documentation ???
+  - [ ] Use emacs-request + org-mode to show interaction with the application / acceptance tests ???
+  - [ ] Final deploy with an alias so that the examples can be run
+  - [ ] Example application to show how things works and how socket works
   - [ ] Check for duplicates when create an anonymous username
   - [ ] Add global eslint
   - [ ] ???

@@ -9,11 +9,14 @@ const db = new Database({inMemoryOnly: true, timestampData: true})
 const bcrypt = require('bcrypt')
 const util = require('util')
 
+var sockets = new Map()
+
 app.use(express.static('public'))
 app.use(require('body-parser').json())
 
 function login(credentials, users, callback) {
   const saltRounds = 5
+  // TODO: use findOne
   users.find({username: credentials.username}, (err, [user]) => {
     if (err) return callback(err)
     if (user) {
@@ -43,8 +46,6 @@ function credentials(credentials, _users, callback) {
   if (credentials.username || credentials.password) {
     return callback(null, credentials)
   }
-
-  // TODO: check for duplicates in storage
   require('crypto').randomBytes(2, (err, buffer) => {
     if (err) return callback(err)
     const username = util.format('user-%s', buffer.toString('hex').toUpperCase())
@@ -72,8 +73,20 @@ app.post('/login', (req, res) => {
   })
 })
 
+io.use((socket, next) => {
+  const token = socket.handshake.query.token;
+  db.findOne({_id: token}, (err, user) => {
+    if (err) return next(err)
+    if (!user) return next(new Error(
+      'Authentication failed, token in not associated to any known user, please try to login again'
+    ));
+    sockets.set(token, socket)
+    return next();
+  })
+});
+
 io.on('connection', socket => {
-  console.log('user connected')
+  console.log('socket connected', {token: socket.handshake.query.token, id: socket.id})
 
   socket.on('messages', msg => {
     io.emit('messages', msg)
