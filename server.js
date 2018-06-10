@@ -145,6 +145,21 @@ app.post('/rooms', authenticate, (req, res) => {
   })
 })
 
+app.post('/rooms/:name/users', authenticate, (req, res) => {
+  // TOOD: validate parameters
+  // TODO: remove duplication of access to a room
+  rooms.findOne({$or: [{name: req.params.name}, {_id: req.params.name}]}, (err, room) => {
+    if (err) return res.status(500).end()
+    if (!room) return res.status(404).end()
+    if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
+    users.update({username: req.body.username}, {$addToSet: {rooms: room.name}}, {}, (err, numAffected) => {
+      if (err) return res.status(500).end()
+      if (numAffected === 0) return res.status(404).end()
+      res.status(200).json(room)
+    })
+  })
+})
+
 app.get('/rooms/:name', authenticate, (req, res) => {
   // TODO: remove duplication of access to a room
   rooms.findOne({$or: [{name: req.params.name}, {_id: req.params.name}]}, (err, room) => {
