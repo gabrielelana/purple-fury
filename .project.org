@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [15/36]
+* Server Side [16/40]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -70,14 +70,18 @@
     - [X] Add room to list of private rooms to the user that creates the private room
   - [X] ~GET /rooms/{id}~ to read properties of a room
   - [X] Add ~.end()~ to every ~res.status(XXX)~
-  - [ ] Post messages to private rooms
+  - [X] Post messages to private rooms
+  - [ ] Can have multiple sockets associated to a single user
   - [ ] ~POST /rooms/{id}/users~ to invite an user to a room
-  - [ ] ~GET /users/{token}/messages~
-  - [ ] ~GET /room/{name}/messages~
   - [ ] ~GET /rooms~ public rooms + private rooms accessible from the current user
+  - [ ] ~GET /users~
+  - [ ] ~GET /users/connected~
+  - [ ] ~GET /room/{name}/messages~
   - [ ] Parameters validation ???
   - [ ] Add ~Location~ header after login and ~DELETE /login/{id}~
+  - [ ] Private channels user to user
   - [ ] Notify users when they are invited to a room (notifications are persistent)
+  - [ ] ~GET /users/{token}/messages~
   - [ ] APIs documentation ???
   - [ ] Use emacs-request + org-mode to show interaction with the application / acceptance tests ???
   - [ ] Final deploy with an alias so that the examples can be run

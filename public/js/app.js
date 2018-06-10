@@ -14,10 +14,22 @@ $(() => {
 
         superagent
           .post('/rooms')
-          .send({token, name: 'random', topic: 'something to chat about'})
+          .send({token, name: 'gossip', topic: 'something secret', isPrivate: true})
           .end((err, res) => {
-            console.log('create room', res)
+            console.log('create a private room', res)
+            setTimeout(
+              () => {
+                superagent
+                  .post('/messages')
+                  .send({token, message: 'this is between us', room: 'gossip'})
+                  .end((err, res) => {
+                    console.log('post to a private room', res)
+                  })
+              },
+              5000
+            )
           })
+
 
         $('form').submit(() => {
           const message = $('#m').val()
@@ -32,7 +44,7 @@ $(() => {
         })
 
         socket.on('messages', data => {
-          $('#messages').append($('<li>').text(data.message))
+          $('#messages').append($('<li>').text(data.room + ':' + data.username + '> ' + data.message))
         })
       }
 
