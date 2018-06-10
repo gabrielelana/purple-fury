@@ -143,10 +143,10 @@ app.post('/rooms', authenticate, (req, res) => {
   })
 })
 
-app.post('/rooms/:name/users', authenticate, (req, res) => {
+app.post('/rooms/:room/users', authenticate, (req, res) => {
   // TOOD: validate parameters
   // TODO: remove duplication of access to a room
-  rooms.findOne({$or: [{name: req.params.name}, {_id: req.params.name}]}, (err, room) => {
+  rooms.findOne({$or: [{name: req.params.room}, {_id: req.params.room}]}, (err, room) => {
     if (err) return res.status(500).end()
     if (!room) return res.status(404).end()
     if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
@@ -167,9 +167,9 @@ app.get('/rooms', authenticate, (req, res) => {
   })
 })
 
-app.get('/rooms/:name', authenticate, (req, res) => {
+app.get('/rooms/:room', authenticate, (req, res) => {
   // TODO: remove duplication of access to a room
-  rooms.findOne({$or: [{name: req.params.name}, {_id: req.params.name}]}, (err, room) => {
+  rooms.findOne({$or: [{name: req.params.room}, {_id: req.params.room}]}, (err, room) => {
     if (err) return res.status(500).end()
     if (!room) return res.status(404).end()
     if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
