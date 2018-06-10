@@ -77,24 +77,24 @@
   - [X] ~GET /rooms~ public rooms + private rooms accessible from the current user
   - [X] Remove the owner concept from a room
   - [X] Use ~room~ or ~user~ as parameter name when you need something like ~name|id~
-  - [ ] ~GET /users~
-  - [ ] ~GET /users/connected~
-  - [ ] ~GET /room/{name}/messages~ ordered
-  - [ ] Socket channel ~notifications~
+  - [ ] ~GET /users~ add ~connected: true/false~
   - [ ] Socket channel ~users~
+  - [ ] ~GET /room/{name}/messages~ ordered
+  - [ ] ~GET /users/:user/preferences~
+  - [ ] ~PUT /users/:user/preferences~
+  - [ ] Final deploy with an alias so that the examples can be run
+  - [ ] Use emacs-request + org-mode to show interaction with the application
+  - [ ] ???
+  - [ ] ~GET /users/connected~
+  - [ ] Socket channel ~notifications~
   - [ ] ~GET /users/:user/notifications/unread~
   - [ ] ~GET /users/:user/notifications~
   - [ ] Notify users when they are invited to a room
   - [ ] ~DELETE /users/:user/notifications/unread/:notification~
-  - [ ] ~GET /users/:user/preferences~
-  - [ ] ~PUT /users/:user/preferences~
   - [ ] ~GET /messages?search={term}~ ordered
   - [ ] Private channels user to user
   - [ ] Parameters validation ???
   - [ ] APIs documentation ???
-  - [ ] Use emacs-request + org-mode to show interaction with the application / acceptance tests ???
-  - [ ] Final deploy with an alias so that the examples can be run
-  - [ ] ???
   - [ ] Add ~Location~ header after login
   - [ ] ~DELETE /login/{id}~
   - [ ] Check for duplicates when create an anonymous username
