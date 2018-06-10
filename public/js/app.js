@@ -8,8 +8,16 @@ $(() => {
     .send({username, password})
     .end((err, res) => {
       if (res.status === 200) {
+        console.log('login', res)
         const token = res.body.token
         const socket = io({query: {token}})
+
+        superagent
+          .post('/rooms')
+          .send({token, name: 'random', topic: 'something to chat about'})
+          .end((err, res) => {
+            console.log('create room', res)
+          })
 
         $('form').submit(() => {
           const message = $('#m').val()

@@ -15,6 +15,7 @@ var sockets = new Map()
 
 app.use(express.static('public'))
 app.use(require('body-parser').json())
+app.use(require('cookie-parser')())
 
 function login(credentials, users, callback) {
   const saltRounds = 5
@@ -34,7 +35,7 @@ function login(credentials, users, callback) {
     } else {
       bcrypt.hash(credentials.password, saltRounds, function(err, hashedPassword) {
         if (err) return callback(err)
-        users.insert({username: credentials.username, password: hashedPassword}, (err, user) => {
+        users.insert({username: credentials.username, password: hashedPassword, rooms: []}, (err, user) => {
           if (err) return callback(err)
           console.log('created:', user)
           callback(null, user)
@@ -60,8 +61,9 @@ function credentials(credentials, _users, callback) {
 }
 
 function authenticate(req, res, next) {
-  if (!req.body.token) return res.status(401).json({error: 'Missing authentication token'})
-  users.findOne({_id: req.body.token}, (err, user) => {
+  const token = req.body.token || req.query.token || req.cookies.token
+  if (!token) return res.status(401).json({error: 'Missing authentication token'})
+  users.findOne({_id: token}, (err, user) => {
     if (err) return res.status(500)
     if (!user) return res.status(401).json({error: 'Wrong authentication token'})
     req.authenticatedUser = user
@@ -80,7 +82,7 @@ app.post('/login', (req, res) => {
       if (err) {
         return res.status(500)
       }
-      res.status(200).json({username: user.username, token: user._id})
+      res.status(200).cookie('token', user._id).json({username: user.username, token: user._id})
     })
   })
 })
@@ -101,6 +103,35 @@ app.post('/messages', authenticate, (req, res) => {
       io.emit('messages', message)
       res.status(201).location(`/messages/${message._id}`).json(message)
     })
+  })
+})
+
+app.post('/rooms', authenticate, (req, res) => {
+  // TODO: validate parameters
+  const roomToCreate = {
+    name: req.body.name,
+    topic: req.body.topic,
+    isPrivate: req.body.isPrivate || false,
+    owner: req.authenticatedUser.username,
+  }
+  rooms.findOne({name: roomToCreate.name}, (err, roomFound) => {
+    if (err) return res.status(500)
+    if (roomFound) return res.status(302).location(`/rooms/${roomFound._id}`).json(roomFound)
+
+    rooms.insert(roomToCreate, (err, roomCreated) => {
+      if (err) return res.status(500)
+      res.status(201).location(`/rooms/${roomCreated.name}`).json(roomCreated)
+    })
+  })
+})
+
+app.get('/rooms/:name', authenticate, (req, res) => {
+  // TODO: remove duplication of access to a room
+  rooms.findOne({$or: [{name: req.params.name}, {_id: req.params.name}]}, (err, room) => {
+    if (err) return res.status(500).end()
+    if (!room) return res.status(404).end()
+    if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
+    res.status(200).json(room)
   })
 })
 
@@ -127,7 +158,7 @@ io.on('connection', socket => {
   })
 })
 
-rooms.insert({name: 'main', isPrivate: false}, (err, _room) => {
+rooms.insert({name: 'main', isPrivate: false, owner: '_root_'}, (err, _room) => {
   server.listen(4000, () => {
     console.log('The server is running: http://localhost:4000')
   })
