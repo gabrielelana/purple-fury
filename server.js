@@ -106,7 +106,7 @@ app.post('/messages', authenticate, (req, res) => {
           if (err) return res.status(500).end()
           usersWithAccess.map((userWithAccess) => {
             if (sockets.has(userWithAccess._id)) {
-              sockets.get(userWithAccess._id).emit('messages', message)
+              sockets.get(userWithAccess._id).forEach(socket => socket.emit('messages', message))
             }
           })
           res.status(201).location(`/messages/${message._id}`).json(message)
@@ -163,7 +163,10 @@ io.use((socket, next) => {
       'Authentication failed, token in not associated to any known user, please try to login again'
     ));
     // create association between token and socket
-    sockets.set(token, socket)
+    // TODO: extract
+    let socketsForUser = sockets.get(token) || []
+    socketsForUser.push(socket)
+    sockets.set(token, socketsForUser)
     return next();
   })
 })
@@ -174,7 +177,11 @@ io.on('connection', socket => {
   socket.on('disconnect', () => {
     console.log('socket disconnected', {token: socket.handshake.query.token, id: socket.id})
     // remove association between token and socket
-    sockets.delete(socket.handshake.query.token)
+    // TODO: extract
+    const token = socket.handshake.query.token;
+    let socketsForUser = sockets.get(token) || []
+    socketsForUser = socketsForUser.filter(socketForUser => socketForUser.id !== socket.id)
+    sockets.set(token, socketsForUser)
   })
 })
 
