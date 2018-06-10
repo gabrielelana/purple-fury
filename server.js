@@ -82,7 +82,7 @@ app.post('/login', (req, res) => {
       if (err) {
         return res.status(500).end()
       }
-      res.status(200).cookie('token', user._id).json({username: user.username, token: user._id})
+      res.status(200).cookie('token', user._id).json({...user, token: user._id})
     })
   })
 })

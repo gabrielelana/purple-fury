@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [18/50]
+* Server Side [19/50]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -73,7 +73,7 @@
   - [X] Post messages to private rooms
   - [X] Can have multiple sockets associated to a single user
   - [X] ~POST /rooms/{id}/users~ to invite an user to a room
-  - [ ] Return full representation of an user after login?
+  - [X] Return full representation of an user after login?
   - [ ] ~GET /rooms~ public rooms + private rooms accessible from the current user
   - [ ] ~GET /users~
   - [ ] ~GET /users/connected~
