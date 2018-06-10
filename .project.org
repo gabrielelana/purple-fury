@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [12/28]
+* Server Side [12/31]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -61,10 +61,16 @@
   - [X] Use login token to connect socket and bind user token to the socket
   - [X] Rename ~db~ in ~users~
   - [X] ~POST /messages~ send a message in a room || main room if not specified otherwise
+    - [X] Create the default room at startup
+    - [X] Check if a room already exists or not
+    - [X] Check if a room is private and if you have access or not
   - [X] Authentication with a middleware
-  - [ ] ~GET /messages~
+  - [ ] Parameters validation ???
   - [ ] ~GET /users/{token}/messages~
   - [ ] ~GET /room/{name}/messages~
+  - [ ] ~POST /rooms~ specify if public or private
+  - [ ] ~GET /rooms~ public rooms + private rooms accessible from the current user
+  - [ ] Add ~Location~ header after login and ~DELETE /login/{id}~
   - [ ] APIs documentation ???
   - [ ] Use emacs-request + org-mode to show interaction with the application / acceptance tests ???
   - [ ] Final deploy with an alias so that the examples can be run
@@ -96,7 +102,7 @@
   - An user can create a private chat room to chat with another user
   - An user can create a private chat room and invite other users to chat
   - An user can configure its avatar
-  - An user can tell if a room has unread messages
+  - An user can tell if a room has unread messages ???
   - An user can mention another user by prefixing his username with `@`
   - An user can mention a topic by prefixing it with `#`
   - An user will be notified if mentioned in a message

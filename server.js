@@ -6,6 +6,7 @@ const io = require('socket.io')(server)
 const Database = require('nedb')
 const users = new Database({inMemoryOnly: true, timestampData: true})
 const messages = new Database({inMemoryOnly: true, timestampData: true})
+const rooms = new Database({inMemoryOnly: true, timestampData: true})
 
 const bcrypt = require('bcrypt')
 const util = require('util')
@@ -58,22 +59,6 @@ function credentials(credentials, _users, callback) {
   })
 }
 
-app.post('/login', (req, res) => {
-  credentials({username: req.body.username, password: req.body.password}, users, (err, credentials) => {
-    login(credentials, users, (err, user) => {
-      if (err && err.error === 'wrong-password') {
-        return res.status(401).json({
-          error: "Wrong password, if you tried to create an account then the username is already taken"
-        })
-      }
-      if (err) {
-        return res.status(500)
-      }
-      res.status(200).json({username: user.username, token: user._id})
-    })
-  })
-})
-
 function authenticate(req, res, next) {
   if (!req.body.token) return res.status(401).json({error: 'Missing authentication token'})
   users.findOne({_id: req.body.token}, (err, user) => {
@@ -84,6 +69,22 @@ function authenticate(req, res, next) {
   })
 }
 
+app.post('/login', (req, res) => {
+  credentials({username: req.body.username, password: req.body.password}, users, (err, credentials) => {
+    login(credentials, users, (err, user) => {
+      if (err && err.error === 'wrong-password') {
+        return res.status(401).json({
+          error: 'Wrong password, if you tried to create an account then the username is already taken'
+        })
+      }
+      if (err) {
+        return res.status(500)
+      }
+      res.status(200).json({username: user.username, token: user._id})
+    })
+  })
+})
+
 app.post('/messages', authenticate, (req, res) => {
   // TODO: validate parameters
   const message = {
@@ -91,11 +92,15 @@ app.post('/messages', authenticate, (req, res) => {
     message: req.body.message,
     room: req.body.room || 'main',
   }
-  messages.insert(message, (err, message) => {
+  rooms.findOne({name: message.room}, (err, room) => {
     if (err) return res.status(500)
-
-    io.emit('messages', message)
-    res.status(201).location(`/messages/${message._id}`).json(message)
+    if (!room) return res.status(404).json('Room not found')
+    if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
+    messages.insert(message, (err, message) => {
+      if (err) return res.status(500)
+      io.emit('messages', message)
+      res.status(201).location(`/messages/${message._id}`).json(message)
+    })
   })
 })
 
@@ -122,6 +127,8 @@ io.on('connection', socket => {
   })
 })
 
-server.listen(4000, () => {
-  console.log('The server is running: http://localhost:4000')
+rooms.insert({name: 'main', isPrivate: false}, (err, _room) => {
+  server.listen(4000, () => {
+    console.log('The server is running: http://localhost:4000')
+  })
 })
