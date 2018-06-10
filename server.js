@@ -120,7 +120,14 @@ app.post('/rooms', authenticate, (req, res) => {
 
     rooms.insert(roomToCreate, (err, roomCreated) => {
       if (err) return res.status(500)
-      res.status(201).location(`/rooms/${roomCreated.name}`).json(roomCreated)
+      if (roomCreated.isPrivate) {
+        users.update({_id: req.authenticatedUser._id}, {}, {}, (err) => {
+          if (err) return res.status(500).end()
+          res.status(201).location(`/rooms/${roomCreated.name}`).json(roomCreated)
+        })
+      } else {
+        res.status(201).location(`/rooms/${roomCreated.name}`).json(roomCreated)
+      }
     })
   })
 })
