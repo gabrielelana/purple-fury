@@ -64,7 +64,7 @@ function authenticate(req, res, next) {
   const token = req.body.token || req.query.token || req.cookies.token
   if (!token) return res.status(401).json({error: 'Missing authentication token'})
   users.findOne({_id: token}, (err, user) => {
-    if (err) return res.status(500)
+    if (err) return res.status(500).end()
     if (!user) return res.status(401).json({error: 'Wrong authentication token'})
     req.authenticatedUser = user
     next()
@@ -80,7 +80,7 @@ app.post('/login', (req, res) => {
         })
       }
       if (err) {
-        return res.status(500)
+        return res.status(500).end()
       }
       res.status(200).cookie('token', user._id).json({username: user.username, token: user._id})
     })
@@ -95,11 +95,11 @@ app.post('/messages', authenticate, (req, res) => {
     room: req.body.room || 'main',
   }
   rooms.findOne({name: message.room}, (err, room) => {
-    if (err) return res.status(500)
+    if (err) return res.status(500).end()
     if (!room) return res.status(404).json('Room not found')
     if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
     messages.insert(message, (err, message) => {
-      if (err) return res.status(500)
+      if (err) return res.status(500).end()
       io.emit('messages', message)
       res.status(201).location(`/messages/${message._id}`).json(message)
     })
@@ -115,11 +115,11 @@ app.post('/rooms', authenticate, (req, res) => {
     owner: req.authenticatedUser.username,
   }
   rooms.findOne({name: roomToCreate.name}, (err, roomFound) => {
-    if (err) return res.status(500)
+    if (err) return res.status(500).end()
     if (roomFound) return res.status(302).location(`/rooms/${roomFound._id}`).json(roomFound)
 
     rooms.insert(roomToCreate, (err, roomCreated) => {
-      if (err) return res.status(500)
+      if (err) return res.status(500).end()
       if (roomCreated.isPrivate) {
         users.update({_id: req.authenticatedUser._id}, {}, {}, (err) => {
           if (err) return res.status(500).end()
