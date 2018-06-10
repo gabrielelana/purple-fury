@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [11/28]
+* Server Side [12/28]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -61,7 +61,7 @@
   - [X] Use login token to connect socket and bind user token to the socket
   - [X] Rename ~db~ in ~users~
   - [X] ~POST /messages~ send a message in a room || main room if not specified otherwise
-  - [ ] Authentication with a middleware
+  - [X] Authentication with a middleware
   - [ ] ~GET /messages~
   - [ ] ~GET /users/{token}/messages~
   - [ ] ~GET /room/{name}/messages~

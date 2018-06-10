@@ -74,26 +74,28 @@ app.post('/login', (req, res) => {
   })
 })
 
-app.post('/messages', (req, res) => {
-  // TODO: validate parameters
-  // TODO: token authentication with a middleware
+function authenticate(req, res, next) {
+  if (!req.body.token) return res.status(401).json({error: 'Missing authentication token'})
   users.findOne({_id: req.body.token}, (err, user) => {
     if (err) return res.status(500)
-    if (!user) return res.status(401).json({
-      error: 'Authentication failed, token in not associated to any known user, please try to login again'
-    })
+    if (!user) return res.status(401).json({error: 'Wrong authentication token'})
+    req.authenticatedUser = user
+    next()
+  })
+}
 
-    const message = {
-      username: user.username,
-      message: req.body.message,
-      room: req.body.room || 'main',
-    }
-    messages.insert(message, (err, message) => {
-      if (err) return res.status(500)
+app.post('/messages', authenticate, (req, res) => {
+  // TODO: validate parameters
+  const message = {
+    username: req.authenticatedUser.username,
+    message: req.body.message,
+    room: req.body.room || 'main',
+  }
+  messages.insert(message, (err, message) => {
+    if (err) return res.status(500)
 
-      io.emit('messages', message)
-      res.status(201).location(`/messages/${message._id}`).json(message)
-    })
+    io.emit('messages', message)
+    res.status(201).location(`/messages/${message._id}`).json(message)
   })
 })
 

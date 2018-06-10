@@ -7,8 +7,6 @@ $(() => {
     .post('/login')
     .send({username, password})
     .end((err, res) => {
-      console.log('login', res)
-
       if (res.status === 200) {
         const token = res.body.token
         const socket = io({query: {token}})
@@ -19,7 +17,7 @@ $(() => {
             .post('/messages')
             .send({token, message})
             .end((err, res) => {
-              console.log(res)
+              $('#m').val('')
             })
 
           return false
