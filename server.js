@@ -67,7 +67,7 @@ app.post('/login', (req, res) => {
       if (err) {
         return res.status(500)
       }
-      res.status(200).json({username: user.username, id: user._id})
+      res.status(200).json({username: user.username, token: user._id})
     })
   })
 })
