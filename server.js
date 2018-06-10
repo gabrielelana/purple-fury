@@ -125,12 +125,10 @@ app.post('/rooms', authenticate, (req, res) => {
     name: req.body.name,
     topic: req.body.topic,
     isPrivate: req.body.isPrivate || false,
-    owner: req.authenticatedUser.username,
   }
   rooms.findOne({name: roomToCreate.name}, (err, roomFound) => {
     if (err) return res.status(500).end()
     if (roomFound) return res.status(302).location(`/rooms/${roomFound._id}`).json(roomFound)
-
     rooms.insert(roomToCreate, (err, roomCreated) => {
       if (err) return res.status(500).end()
       if (roomCreated.isPrivate) {
@@ -201,7 +199,7 @@ io.on('connection', socket => {
   })
 })
 
-rooms.insert({name: 'main', isPrivate: false, owner: '_root_'}, (err, _room) => {
+rooms.insert({name: 'main', topic: 'main', isPrivate: false}, (err, _room) => {
   server.listen(4000, () => {
     console.log('The server is running: http://localhost:4000')
   })
