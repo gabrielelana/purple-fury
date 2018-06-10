@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [19/50]
+* Server Side [21/52]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -74,7 +74,9 @@
   - [X] Can have multiple sockets associated to a single user
   - [X] ~POST /rooms/{id}/users~ to invite an user to a room
   - [X] Return full representation of an user after login?
-  - [ ] ~GET /rooms~ public rooms + private rooms accessible from the current user
+  - [X] ~GET /rooms~ public rooms + private rooms accessible from the current user
+  - [X] Remove the owner concept from a room
+  - [ ] Use ~room~ or ~user~ as parameter name when you need something like ~name|id~
   - [ ] ~GET /users~
   - [ ] ~GET /users/connected~
   - [ ] ~GET /room/{name}/messages~ ordered

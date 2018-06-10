@@ -159,6 +159,14 @@ app.post('/rooms/:name/users', authenticate, (req, res) => {
   })
 })
 
+app.get('/rooms', authenticate, (req, res) => {
+  rooms.find({$or: [{isPrivate: false}, {isPrivate: true, name: {$in: req.authenticatedUser.rooms}}]}, (err, rooms) => {
+    res.status(200).json({
+      rooms: rooms.map(({name, topic, isPrivate}) => ({name, topic, isPrivate}))
+    })
+  })
+})
+
 app.get('/rooms/:name', authenticate, (req, res) => {
   // TODO: remove duplication of access to a room
   rooms.findOne({$or: [{name: req.params.name}, {_id: req.params.name}]}, (err, room) => {

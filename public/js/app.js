@@ -43,6 +43,15 @@ function inviteUser(token, room, username, callback) {
     })
 }
 
+function listOfRooms(token, callback) {
+  superagent
+    .get('/rooms?token=' + token)
+    .end((err, res) => {
+      console.log('list-of-rooms', err, res)
+      callback(err, res.body.rooms)
+    })
+}
+
 
 $(() => {
 
@@ -53,6 +62,10 @@ $(() => {
       if (err) return err
       inviteUser(token, 'gossip', 'chiara', (err) => {
         if (err) return err
+        listOfRooms(token, (err, rooms) => {
+          if (err) return err
+          console.log('rooms', rooms)
+        })
         postMessage(token, 'gossip', 'this must stay between us', (err) => {
           if (err) return err
         })
