@@ -13,6 +13,7 @@
      - Deploy a “Walking Skeleton” in production
        - Fork the project ???
        - Create an account on https://zeit.co
+       - Install NodeJS 8.11.2
        - Install now with ~$ npm install -g now~ and go through authentication process
        - From the project root run  ~$ now~ and be amazed that everything works
      - Look at the user stories
@@ -48,12 +49,17 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [1/8]
+* Server Side [2/13]
   - [X] Deploy hello world application on now
-  - [ ] Basic chat application with socket.io
-  - [ ] Run server side tests on Travis on deploy
-  - [ ] Run client side tests on Travis on deploy
+  - [X] Basic chat application with socket.io
+  - [ ] Add ~nodemon~ to restart the server on change
+  - [ ] Add middleware to serve the favicon
+  - [ ] Login an user anonymously
+  - [ ] Login an user with username/password and lock that username
   - [ ] ???
+  - [ ] Run server side tests on Travis on deploy
+  - [ ] Add a basic ReacJS application in ~/client~ after build copy in ~/public~
+  - [ ] Run client side tests on Travis on deploy
   - [ ] Create final repository ~codemaster-2018~ with an appropriate ~README.md~
   - [ ] Fork the fork the repository and deploy it
     - Does forking on Github create an upstream remote by default? If
