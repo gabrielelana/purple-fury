@@ -49,13 +49,17 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [2/13]
+* Server Side [7/17]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
-  - [ ] Add ~nodemon~ to restart the server on change
-  - [ ] Add middleware to serve the favicon
-  - [ ] Login an user anonymously
-  - [ ] Login an user with username/password and lock that username
+  - [X] Add ~nodemon~ to restart the server on change
+  - [X] Add middleware to serve the favicon
+  - [X] Add ~client~ directory
+  - [X] Login an user anonymously
+  - [X] Login an user with username/password and lock that username
+  - [ ] Use login id to connect socket and bind the socket to the user
+  - [ ] Check for duplicates when create an anonymous username
+  - [ ] Add global eslint
   - [ ] ???
   - [ ] Run server side tests on Travis on deploy
   - [ ] Add a basic ReacJS application in ~/client~ after build copy in ~/public~
