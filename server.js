@@ -4,7 +4,8 @@ const server = require('http').Server(app)
 const io = require('socket.io')(server)
 
 const Database = require('nedb')
-const db = new Database({inMemoryOnly: true, timestampData: true})
+const users = new Database({inMemoryOnly: true, timestampData: true})
+const messages = new Database({inMemoryOnly: true, timestampData: true})
 
 const bcrypt = require('bcrypt')
 const util = require('util')
@@ -58,8 +59,8 @@ function credentials(credentials, _users, callback) {
 }
 
 app.post('/login', (req, res) => {
-  credentials({username: req.body.username, password: req.body.password}, db, (err, credentials) => {
-    login(credentials, db, (err, user) => {
+  credentials({username: req.body.username, password: req.body.password}, users, (err, credentials) => {
+    login(credentials, users, (err, user) => {
       if (err && err.error === 'wrong-password') {
         return res.status(401).json({
           error: "Wrong password, if you tried to create an account then the username is already taken"
@@ -73,27 +74,49 @@ app.post('/login', (req, res) => {
   })
 })
 
+app.post('/messages', (req, res) => {
+  // TODO: validate parameters
+  // TODO: token authentication with a middleware
+  users.findOne({_id: req.body.token}, (err, user) => {
+    if (err) return res.status(500)
+    if (!user) return res.status(401).json({
+      error: 'Authentication failed, token in not associated to any known user, please try to login again'
+    })
+
+    const message = {
+      username: user.username,
+      message: req.body.message,
+      room: req.body.room || 'main',
+    }
+    messages.insert(message, (err, message) => {
+      if (err) return res.status(500)
+
+      io.emit('messages', message)
+      res.status(201).location(`/messages/${message._id}`).json(message)
+    })
+  })
+})
+
 io.use((socket, next) => {
   const token = socket.handshake.query.token;
-  db.findOne({_id: token}, (err, user) => {
+  users.findOne({_id: token}, (err, user) => {
     if (err) return next(err)
     if (!user) return next(new Error(
       'Authentication failed, token in not associated to any known user, please try to login again'
     ));
+    // create association between token and socket
     sockets.set(token, socket)
     return next();
   })
-});
+})
 
 io.on('connection', socket => {
   console.log('socket connected', {token: socket.handshake.query.token, id: socket.id})
 
-  socket.on('messages', msg => {
-    io.emit('messages', msg)
-  })
-
   socket.on('disconnect', () => {
-    console.log('user disconnected')
+    console.log('socket disconnected', {token: socket.handshake.query.token, id: socket.id})
+    // remove association between token and socket
+    sockets.delete(socket.handshake.query.token)
   })
 })
 

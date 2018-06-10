@@ -10,16 +10,23 @@ $(() => {
       console.log('login', res)
 
       if (res.status === 200) {
-        const socket = io({query: {token: res.body.token}})
+        const token = res.body.token
+        const socket = io({query: {token}})
 
         $('form').submit(() => {
-          socket.emit('messages', $('#m').val())
-          $('#m').val('')
+          const message = $('#m').val()
+          superagent
+            .post('/messages')
+            .send({token, message})
+            .end((err, res) => {
+              console.log(res)
+            })
+
           return false
         })
 
-        socket.on('messages', msg => {
-          $('#messages').append($('<li>').text(msg))
+        socket.on('messages', data => {
+          $('#messages').append($('<li>').text(data.message))
         })
       }
 
