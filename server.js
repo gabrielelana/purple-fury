@@ -152,6 +152,7 @@ app.post('/rooms/:name/users', authenticate, (req, res) => {
     if (err) return res.status(500).end()
     if (!room) return res.status(404).end()
     if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
+    if (!room.isPrivate) res.status(200).json(room)
     users.update({username: req.body.username}, {$addToSet: {rooms: room.name}}, {}, (err, numAffected) => {
       if (err) return res.status(500).end()
       if (numAffected === 0) return res.status(404).end()
