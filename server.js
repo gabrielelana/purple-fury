@@ -40,6 +40,7 @@ function login(credentials, users, callback) {
           password: hashedPassword,
           rooms: [],
           preferences: {},
+          profile: {},
         }
         users.insert(user, (err, user) => {
           if (err) return callback(err)
@@ -200,7 +201,7 @@ app.get('/users', (req, res) => {
   users.find({}, (err, rooms) => {
     if (err) return res.status(500).end()
     res.status(200).json({
-      users: rooms.map(({_id, username}) => ({username, isConnected: sockets.has(_id)}))
+      users: rooms.map(({_id, username, profile}) => ({username, profile, isConnected: sockets.has(_id)}))
     })
   })
 })
@@ -222,6 +223,18 @@ app.get('/users/:user/preferences', authenticate, (req, res) => {
     if (!user) return res.status(404).end()
     if (req.authenticatedUser._id !== user._id) return res.status(401).end()
     res.status(200).json(user.preferences)
+  })
+})
+
+app.put('/users/:user/profile', authenticate, (req, res) => {
+  // TOOD: validate body parameters `profile`
+  users.findOne({$or: [{username: req.params.user}, {_id: req.params.user}]}, (err, user) => {
+    if (!user) return res.status(404).end()
+    if (req.authenticatedUser._id !== user._id) return res.status(401).end()
+    users.update({_id: user._id}, {$set: {profile: req.body.profile}}, {}, (err) => {
+      if (err) return res.status(500).end()
+      res.status(200).json(req.body.profile)
+    })
   })
 })
 
