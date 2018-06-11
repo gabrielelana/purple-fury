@@ -177,6 +177,14 @@ app.get('/rooms/:room', authenticate, (req, res) => {
   })
 })
 
+app.get('/users', authenticate, (req, res) => {
+  users.find({}, (err, rooms) => {
+    res.status(200).json({
+      users: rooms.map(({_id, username}) => ({username, isConnected: sockets.has(_id)}))
+    })
+  })
+})
+
 io.use((socket, next) => {
   const token = socket.handshake.query.token;
   users.findOne({_id: token}, (err, user) => {

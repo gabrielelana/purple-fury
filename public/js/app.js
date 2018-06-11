@@ -52,6 +52,15 @@ function listOfRooms(token, callback) {
     })
 }
 
+function listOfUsers(token, callback) {
+  superagent
+    .get('/users?token=' + token)
+    .end((err, res) => {
+      console.log('list-of-users', err, res)
+      callback(err, res.body.rooms)
+    })
+}
+
 
 $(() => {
 
@@ -92,6 +101,10 @@ $(() => {
       () => {
         postMessage(token, 'gossip', 'sure thing ;-)', (err) => {
           if (err) return err
+        })
+        listOfUsers(token, (err, users) => {
+          if (err) return err
+          console.log('users', users)
         })
       },
       5000
