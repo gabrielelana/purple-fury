@@ -88,8 +88,9 @@ function validate(req, res, next) {
 
 app.post(
   '/login',
-  [ body('username').optional().isAlphanumeric().isLength({min: 3}),
-    body('password').optional().isAlphanumeric().isLength({min: 3}),
+  [
+    body('username').optional().matches(/[-_a-zA-Z0-9.]+/).isLength({min: 3}),
+    body('password').optional().isString().isLength({min: 3}),
     validate,
   ],
   (req, res) => {
@@ -113,7 +114,7 @@ app.post(
   authenticate,
   [
     body('message').isString().isLength({min: 1}),
-    body('room').isAlphanumeric().isLength({min: 3}),
+    body('room').optional().isAlphanumeric().isLength({min: 3}),
     validate
   ],
   (req, res) => {
@@ -151,8 +152,8 @@ app.post(
   '/rooms',
   authenticate,
   [
-    body('name').isAlphanumeric().isLength({min: 3}),
-    body('topic').isAlphanumeric().isLength({min: 3}),
+    body('name').matches(/[-_a-zA-Z0-9.]+/).isLength({min: 3}),
+    body('topic').isString().isLength({min: 3}),
     body('isPrivate').optional().isBoolean(),
     validate
   ],
@@ -183,7 +184,7 @@ app.post(
   '/rooms/:room/users',
   authenticate,
   [
-    body('username').isAlphanumeric().isLength({min: 3}),
+    body('username').optional().matches(/[-_a-zA-Z0-9.]+/).isLength({min: 3}),
     validate,
   ],
   (req, res) => {
