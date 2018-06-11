@@ -50,7 +50,7 @@
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
 * Server Side
-** User Stories [32/52]
+** User Stories [33/52]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -86,11 +86,10 @@
   - [X] ~PUT /users/:user/profile~
   - [X] ~GET /messages~ all messages in all available rooms
   - [X] Parameters validation with ~express-validator~
-  - [ ] Use emacs-request + org-mode to show interaction with the application
-  - [ ] Add ~Location~ header after login
+  - [X] Show interaction with the application with org-mode and ob-http
   - [X] Example application to show how things works and how socket works
   - [X] Final deploy with an alias so that the examples can be run
-  - [ ] ???
+  - [ ] Check for duplicates when create an anonymous username
   - [ ] ~DELETE /rooms/:room~ also remove all references in ~users~ if it's a private room
   - [ ] Notifications
     - [ ] Socket channel ~notifications~
@@ -103,19 +102,12 @@
   - [ ] Notify users when an message has been modified or deleted
   - [ ] ~GET /messages?search={term}~ ordered
   - [ ] Tests
-  - [ ] APIs documentation ???
-  - [ ] Check for duplicates when create an anonymous username
   - [ ] ~GET /users/{token}/messages~
   - [ ] Add global eslint
   - [ ] Run server side tests on Travis on deploy
   - [ ] Add a basic ReacJS application in ~/client~ after build copy in ~/public~
   - [ ] Run client side tests on Travis on deploy
   - [ ] Create final repository ~codemaster-2018~ with an appropriate ~README.md~
-  - [ ] Fork the fork the repository and deploy it
-    - Does forking on Github create an upstream remote by default? If
-      no then put the instruction on ~README.md~ the students must be
-      able to pull and rebase on upstream in case of another future or
-      a bug fix.
   - [ ] Emacs flycheck JSON syntax
 ** APIs
 *** Login anonymously
