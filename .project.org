@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [26/54]
+* Server Side [26/56]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -84,18 +84,20 @@
   - [ ] ~GET /users/:user/preferences~
   - [ ] ~PUT /users/:user/profile~
   - [ ] ~GET /users/:user/profile~
-  - [X] Final deploy with an alias so that the examples can be run
+  - [ ] Parameters validation ???
   - [ ] Use emacs-request + org-mode to show interaction with the application
+  - [X] Final deploy with an alias so that the examples can be run
   - [ ] ???
-  - [ ] ~GET /users/connected~
   - [ ] Socket channel ~notifications~
   - [ ] ~GET /users/:user/notifications/unread~
+  - [ ] ~DELETE /users/:user/notifications/unread/:notification~
   - [ ] ~GET /users/:user/notifications~
   - [ ] Notify users when they are invited to a room
-  - [ ] ~DELETE /users/:user/notifications/unread/:notification~
+  - [ ] ~PUT /messages/:id~ to modify a message
+  - [ ] ~DELETE /message/:id~ to delete a message
+  - [ ] Notify users when an message has been modified or deleted
   - [ ] ~GET /messages?search={term}~ ordered
-  - [ ] Private channels user to user
-  - [ ] Parameters validation ???
+  - [ ] Tests
   - [ ] APIs documentation ???
   - [ ] Add ~Location~ header after login
   - [ ] ~DELETE /login/{id}~
@@ -126,7 +128,6 @@
   - An user can see the list of available rooms
   - An user can create a private chat room to chat with another user
   - An user can create a private chat room and invite other users to chat
-  - An user can configure its avatar
   - An user can tell if a room has unread messages
   - An user can mention another user by prefixing his username with `@`
   - An user can mention a topic by prefixing it with `#`
@@ -146,7 +147,9 @@
   - An user can post multiline messages
   - An user can render one or more lines as code surrounding it with triple backticks
   - An user can quote messages by prefixing it `>`
+  - An user can configure its avatar
   - An user can search for past messages
+  - An user can edit a sent message
   - An user can be seen from other users as “not available to chat”
   - An user can use keyboard shortcuts to access common functionalities
   - A message not yet sent by an user can survive a temporary network connection interruption
