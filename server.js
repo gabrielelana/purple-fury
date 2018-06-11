@@ -19,8 +19,7 @@ app.use(require('cookie-parser')())
 
 function login(credentials, users, callback) {
   const saltRounds = 5
-  // TODO: use findOne
-  users.find({username: credentials.username}, (err, [user]) => {
+  users.findOne({username: credentials.username}, (err, user) => {
     if (err) return callback(err)
     if (user) {
       bcrypt.compare(credentials.password, user.password, (err, correctPassword) => {
