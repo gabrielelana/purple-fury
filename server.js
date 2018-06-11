@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
+const { check, body, validationResult } = require('express-validator/check');
 
 const Database = require('nedb')
 const users = new Database({inMemoryOnly: true, timestampData: true})
@@ -77,93 +78,128 @@ function authenticate(req, res, next) {
   })
 }
 
-app.post('/login', (req, res) => {
-  credentials({username: req.body.username, password: req.body.password}, users, (err, credentials) => {
-    login(credentials, users, (err, user) => {
-      if (err && err.error === 'wrong-password') {
-        return res.status(401).json({
-          error: 'Wrong password, if you tried to create an account then the username is already taken'
-        })
-      }
-      if (err) {
-        return res.status(500).end()
-      }
-      res.status(200).cookie('token', user._id).json({...user, token: user._id})
-    })
-  })
-})
-
-app.post('/messages', authenticate, (req, res) => {
-  // TODO: validate parameters
-  const message = {
-    username: req.authenticatedUser.username,
-    message: req.body.message,
-    room: req.body.room || 'main',
+function validate(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({errors: errors.mapped()})
   }
-  // TODO: remove duplication of access to a room
-  rooms.findOne({name: message.room}, (err, room) => {
-    if (err) return res.status(500).end()
-    if (!room) return res.status(404).json('Room not found')
-    if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
-    messages.insert(message, (err, message) => {
-      if (err) return res.status(500).end()
-      if (room.isPrivate) {
-        users.find({rooms: room.name}, (err, usersWithAccess) => {
-          if (err) return res.status(500).end()
-          usersWithAccess.map((userWithAccess) => {
-            if (sockets.has(userWithAccess._id)) {
-              sockets.get(userWithAccess._id).forEach(socket => socket.emit('messages', message))
-            }
+  next()
+}
+
+app.post(
+  '/login',
+  [ body('username').optional().isAlphanumeric().isLength({min: 3}),
+    body('password').optional().isAlphanumeric().isLength({min: 3}),
+    validate,
+  ],
+  (req, res) => {
+    credentials({username: req.body.username, password: req.body.password}, users, (err, credentials) => {
+      login(credentials, users, (err, user) => {
+        if (err && err.error === 'wrong-password') {
+          return res.status(401).json({
+            error: 'Wrong password, if you tried to create an account then the username is already taken'
           })
+        }
+        if (err) {
+          return res.status(500).end()
+        }
+        res.status(200).cookie('token', user._id).json({...user, token: user._id})
+      })
+    })
+  })
+
+app.post(
+  '/messages',
+  authenticate,
+  [
+    body('message').isString().isLength({min: 1}),
+    body('room').isAlphanumeric().isLength({min: 3}),
+    validate
+  ],
+  (req, res) => {
+    const message = {
+      username: req.authenticatedUser.username,
+      message: req.body.message,
+      room: req.body.room || 'main',
+    }
+    // TODO: remove duplication of access to a room
+    rooms.findOne({name: message.room}, (err, room) => {
+      if (err) return res.status(500).end()
+      if (!room) return res.status(404).json('Room not found')
+      if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
+      messages.insert(message, (err, message) => {
+        if (err) return res.status(500).end()
+        if (room.isPrivate) {
+          users.find({rooms: room.name}, (err, usersWithAccess) => {
+            if (err) return res.status(500).end()
+            usersWithAccess.map((userWithAccess) => {
+              if (sockets.has(userWithAccess._id)) {
+                sockets.get(userWithAccess._id).forEach(socket => socket.emit('messages', message))
+              }
+            })
+            res.status(201).location(`/messages/${message._id}`).json(message)
+          })
+        } else {
+          io.emit('messages', message)
           res.status(201).location(`/messages/${message._id}`).json(message)
-        })
-      } else {
-        io.emit('messages', message)
-        res.status(201).location(`/messages/${message._id}`).json(message)
-      }
+        }
+      })
     })
   })
-})
 
-app.post('/rooms', authenticate, (req, res) => {
-  // TODO: validate parameters
-  const roomToCreate = {
-    name: req.body.name,
-    topic: req.body.topic,
-    isPrivate: req.body.isPrivate || false,
-  }
-  rooms.findOne({name: roomToCreate.name}, (err, roomFound) => {
-    if (err) return res.status(500).end()
-    if (roomFound) return res.status(302).location(`/rooms/${roomFound._id}`).json(roomFound)
-    rooms.insert(roomToCreate, (err, roomCreated) => {
+app.post(
+  '/rooms',
+  authenticate,
+  [
+    body('name').isAlphanumeric().isLength({min: 3}),
+    body('topic').isAlphanumeric().isLength({min: 3}),
+    body('isPrivate').optional().isBoolean(),
+    validate
+  ],
+  (req, res) => {
+    const roomToCreate = {
+      name: req.body.name,
+      topic: req.body.topic,
+      isPrivate: req.body.isPrivate || false,
+    }
+    rooms.findOne({name: roomToCreate.name}, (err, roomFound) => {
       if (err) return res.status(500).end()
-      if (roomCreated.isPrivate) {
-        users.update({_id: req.authenticatedUser._id}, {$addToSet: {rooms: roomCreated.name}}, {}, (err) => {
-          if (err) return res.status(500).end()
+      if (roomFound) return res.status(302).location(`/rooms/${roomFound._id}`).json(roomFound)
+      rooms.insert(roomToCreate, (err, roomCreated) => {
+        if (err) return res.status(500).end()
+        if (roomCreated.isPrivate) {
+          users.update({_id: req.authenticatedUser._id}, {$addToSet: {rooms: roomCreated.name}}, {}, (err) => {
+            if (err) return res.status(500).end()
+            res.status(201).location(`/rooms/${roomCreated.name}`).json(roomCreated)
+          })
+        } else {
           res.status(201).location(`/rooms/${roomCreated.name}`).json(roomCreated)
-        })
-      } else {
-        res.status(201).location(`/rooms/${roomCreated.name}`).json(roomCreated)
-      }
+        }
+      })
     })
   })
-})
 
-app.post('/rooms/:room/users', authenticate, (req, res) => {
-  // TOOD: validate parameters
-  // TODO: remove duplication of access to a room
-  rooms.findOne({$or: [{name: req.params.room}, {_id: req.params.room}]}, (err, room) => {
-    if (err) return res.status(500).end()
-    if (!room) return res.status(404).end()
-    if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
-    if (!room.isPrivate) res.status(200).json(room)
-    users.update({username: req.body.username}, {$addToSet: {rooms: room.name}}, {}, (err, numAffected) => {
+app.post(
+  '/rooms/:room/users',
+  authenticate,
+  [
+    body('username').isAlphanumeric().isLength({min: 3}),
+    validate,
+  ],
+  (req, res) => {
+    // TODO: remove duplication of access to a room
+    rooms.findOne({$or: [{name: req.params.room}, {_id: req.params.room}]}, (err, room) => {
       if (err) return res.status(500).end()
-      if (numAffected === 0) return res.status(404).end()
-      res.status(200).json(room)
+      if (!room) return res.status(404).end()
+      if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
+      if (!room.isPrivate) res.status(200).json(room)
+      users.update({username: req.body.username}, {$addToSet: {rooms: room.name}}, {}, (err, numAffected) => {
+        if (err) return res.status(500).end()
+        if (numAffected === 0) return res.status(404).end()
+        res.status(200).json(room)
+      })
     })
   })
-})
 
 app.get('/rooms', authenticate, (req, res) => {
   rooms.find({$or: [{isPrivate: false}, {isPrivate: true, name: {$in: req.authenticatedUser.rooms}}]}, (err, rooms) => {
@@ -216,17 +252,23 @@ app.get('/users', (req, res) => {
   })
 })
 
-app.put('/users/:user/preferences', authenticate, (req, res) => {
-  // TOOD: validate body parameters `preferences`
-  users.findOne({$or: [{username: req.params.user}, {_id: req.params.user}]}, (err, user) => {
-    if (!user) return res.status(404).end()
-    if (req.authenticatedUser._id !== user._id) return res.status(401).end()
-    users.update({_id: user._id}, {$set: {preferences: req.body.preferences}}, {}, (err) => {
-      if (err) return res.status(500).end()
-      res.status(200).json(req.body.preferences)
+app.put(
+  '/users/:user/preferences',
+  authenticate,
+  [
+    body('preferences').exists().custom((value) => typeof value === 'object' && value.constructor === Object),
+    validate,
+  ],
+  (req, res) => {
+    users.findOne({$or: [{username: req.params.user}, {_id: req.params.user}]}, (err, user) => {
+      if (!user) return res.status(404).end()
+      if (req.authenticatedUser._id !== user._id) return res.status(401).end()
+      users.update({_id: user._id}, {$set: {preferences: req.body.preferences}}, {}, (err) => {
+        if (err) return res.status(500).end()
+        res.status(200).json(req.body.preferences)
+      })
     })
   })
-})
 
 app.get('/users/:user/preferences', authenticate, (req, res) => {
   users.findOne({$or: [{username: req.params.user}, {_id: req.params.user}]}, (err, user) => {
@@ -236,17 +278,23 @@ app.get('/users/:user/preferences', authenticate, (req, res) => {
   })
 })
 
-app.put('/users/:user/profile', authenticate, (req, res) => {
-  // TOOD: validate body parameters `profile`
-  users.findOne({$or: [{username: req.params.user}, {_id: req.params.user}]}, (err, user) => {
-    if (!user) return res.status(404).end()
-    if (req.authenticatedUser._id !== user._id) return res.status(401).end()
-    users.update({_id: user._id}, {$set: {profile: req.body.profile}}, {}, (err) => {
-      if (err) return res.status(500).end()
-      res.status(200).json(req.body.profile)
+app.put(
+  '/users/:user/profile',
+  authenticate,
+  [
+    body('profile').exists().custom((value) => typeof value === 'object' && value.constructor === Object),
+    validate,
+  ],
+  (req, res) => {
+    users.findOne({$or: [{username: req.params.user}, {_id: req.params.user}]}, (err, user) => {
+      if (!user) return res.status(404).end()
+      if (req.authenticatedUser._id !== user._id) return res.status(401).end()
+      users.update({_id: user._id}, {$set: {profile: req.body.profile}}, {}, (err) => {
+        if (err) return res.status(500).end()
+        res.status(200).json(req.body.profile)
+      })
     })
   })
-})
 
 io.use((socket, next) => {
   const token = socket.handshake.query.token;

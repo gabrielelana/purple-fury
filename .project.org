@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [31/53]
+* Server Side [32/53]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -84,7 +84,7 @@
   - [X] ~GET /users/:user/preferences~
   - [X] ~PUT /users/:user/profile~
   - [X] ~GET /messages~ all messages in all available rooms
-  - [ ] Parameters validation ???
+  - [X] Parameters validation with ~express-validator~
   - [ ] Use emacs-request + org-mode to show interaction with the application
   - [ ] Add ~Location~ header after login
   - [X] Example application to show how things works and how socket works
