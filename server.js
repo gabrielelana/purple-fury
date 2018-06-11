@@ -177,8 +177,22 @@ app.get('/rooms/:room', authenticate, (req, res) => {
   })
 })
 
+app.get('/rooms/:room/messages', authenticate, (req, res) => {
+  // TODO: remove duplication of access to a room
+  rooms.findOne({$or: [{name: req.params.room}, {_id: req.params.room}]}, (err, room) => {
+    if (err) return res.status(500).end()
+    if (!room) return res.status(404).end()
+    if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
+    messages.find({room: room.name}).sort({createdAt: 1}).exec((err, messages) => {
+      if (err) return res.status(500).end()
+      res.status(200).json({messages})
+    })
+  })
+})
+
 app.get('/users', authenticate, (req, res) => {
   users.find({}, (err, rooms) => {
+    if (err) return res.status(500).end()
     res.status(200).json({
       users: rooms.map(({_id, username}) => ({username, isConnected: sockets.has(_id)}))
     })

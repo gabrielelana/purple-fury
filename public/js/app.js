@@ -61,6 +61,15 @@ function listOfUsers(token, callback) {
     })
 }
 
+function listOfMessages(token, room, callback) {
+  superagent
+    .get('/rooms/' + room + '/messages?token=' + token)
+    .end((err, res) => {
+      console.log('list-of-messages', err, res)
+      callback(err, res.body.messages)
+    })
+}
+
 
 $(() => {
 
@@ -144,6 +153,10 @@ $(() => {
                           listOfUsers(token, (err, users) => {
                             if (err) return err
                             console.log('users', users)
+                            listOfMessages(token, 'main', (err, messages) => {
+                              if (err) return err
+                              console.log('messages', messages)
+                            })
                           })
                         },
                         1000
