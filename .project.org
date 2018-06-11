@@ -49,7 +49,8 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [32/53]
+* Server Side
+** User Stories [32/52]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -116,6 +117,303 @@
       able to pull and rebase on upstream in case of another future or
       a bug fix.
   - [ ] Emacs flycheck JSON syntax
+** APIs
+*** Login anonymously
+
+#+BEGIN_SRC http :pretty :wrap EXAMPLE
+POST http://localhost:4000/login
+Accept: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "username": "user-EEBC",
+  "password": "$2b$05$P8VO3S/SK./FBmSCqmFxKe.QuJN4WVewj3gbaT8Zdkpev5G243pRG",
+  "rooms": [],
+  "preferences": {},
+  "profile": {},
+  "_id": "M7W1ohVYULE789W0",
+  "createdAt": "2018-06-11T21:06:32.768Z",
+  "updatedAt": "2018-06-11T21:06:32.768Z",
+  "token": "M7W1ohVYULE789W0"
+}
+#+END_EXAMPLE
+
+*** Login with username and password
+
+#+BEGIN_SRC http :pretty :wrap EXAMPLE
+POST http://localhost:4000/login
+Accept: application/json
+Content-Type: application/json
+
+{"username": "user-001", "password": "secret"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "username": "user-001",
+  "password": "$2b$05$yD.XnmI5iktMfvgTRFluF.tv7xC4ttbmH/KyRmhK..9x4kt9aO7FG",
+  "rooms": [],
+  "preferences": {},
+  "profile": {},
+  "_id": "96Nv4F31AWdTnYKx",
+  "createdAt": "2018-06-11T20:57:57.620Z",
+  "updatedAt": "2018-06-11T20:57:57.620Z",
+  "token": "96Nv4F31AWdTnYKx"
+}
+#+END_EXAMPLE
+
+If we login again with the same username and password we are going to obtain the same token
+#+BEGIN_SRC http :pretty :wrap EXAMPLE
+POST http://localhost:4000/login
+Accept: application/json
+Content-Type: application/json
+
+{"username": "user-001", "password": "secret"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "username": "user-001",
+  "password": "$2b$05$yD.XnmI5iktMfvgTRFluF.tv7xC4ttbmH/KyRmhK..9x4kt9aO7FG",
+  "rooms": [],
+  "preferences": {},
+  "profile": {},
+  "_id": "96Nv4F31AWdTnYKx",
+  "createdAt": "2018-06-11T20:57:57.620Z",
+  "updatedAt": "2018-06-11T20:57:57.620Z",
+  "token": "96Nv4F31AWdTnYKx"
+}
+#+END_EXAMPLE
+
+If we try to steal an account we obtain an error
+#+BEGIN_SRC http :pretty :wrap EXAMPLE
+POST http://localhost:4000/login
+Accept: application/json
+Content-Type: application/json
+
+{"username": "user-001", "password": "another"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "error": "Wrong password, if you tried to create an account then the username is already taken"
+}
+#+END_EXAMPLE
+
+*** Post a message
+
+First thing we need to login
+#+NAME: login
+#+BEGIN_SRC http :pretty :select .token :results value silent
+POST http://localhost:4000/login
+Accept: application/json
+Content-Type: application/json
+
+{"username": "user-002", "password": "secret"}
+#+END_SRC
+
+Then using the token we can post a message to the default room
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+POST http://localhost:4000/messages
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "message": "Blessed be the fruit"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "username": "user-002",
+  "message": "Blessed be the fruit",
+  "room": "main",
+  "_id": "YuLhxJqvXPB9h2WC",
+  "createdAt": "2018-06-11T21:15:38.170Z",
+  "updatedAt": "2018-06-11T21:15:38.170Z"
+}
+#+END_EXAMPLE
+
+Without authentication we get an error
+#+BEGIN_SRC http :pretty :wrap EXAMPLE
+POST http://localhost:4000/messages
+Accept: application/json
+Content-Type: application/json
+
+{"message": "Praised be"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "error": "Missing authentication token"
+}
+#+END_EXAMPLE
+
+*** Create and post messages to a public room
+
+Using the authentication token we can post a message to the default room
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+POST http://localhost:4000/rooms
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "name": "ReactJS", "topic": "Everything about ReactJS"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "name": "ReactJS",
+  "topic": "Everything about ReactJS",
+  "isPrivate": false,
+  "_id": "4fPo9FKJXmLgATFF",
+  "createdAt": "2018-06-11T21:33:11.600Z",
+  "updatedAt": "2018-06-11T21:33:11.600Z"
+}
+#+END_EXAMPLE
+
+Then we can post messages to it
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+POST http://localhost:4000/messages
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "room": "ReactJS", "message": "ReactJS is cool"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "username": "user-002",
+  "message": "ReactJS is cool",
+  "room": "ReactJS",
+  "_id": "ZSWV2iIEcI4lBkzw",
+  "createdAt": "2018-06-11T21:36:22.379Z",
+  "updatedAt": "2018-06-11T21:36:22.379Z"
+}
+#+END_EXAMPLE
+
+We cannot post messages to a room that doesn't exists
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+POST http://localhost:4000/messages
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "room": "XXX", "message": "ReactJS is cool"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "error": "Room not found"
+}
+#+END_EXAMPLE
+
+*** Create and invite others to a private room
+
+We are going to create two users
+#+NAME: login-003
+#+BEGIN_SRC http :pretty :select .token :results value silent
+POST http://localhost:4000/login
+Accept: application/json
+Content-Type: application/json
+
+{"username": "user-003", "password": "secret"}
+#+END_SRC
+
+#+NAME: login-004
+#+BEGIN_SRC http :pretty :select .token :results value silent
+POST http://localhost:4000/login
+Accept: application/json
+Content-Type: application/json
+
+{"username": "user-004", "password": "secret"}
+#+END_SRC
+
+user-003 will create a private room ~Gossip~
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-003
+POST http://localhost:4000/rooms
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "name": "Gossip", "topic": "Gossip", "isPrivate": true}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "name": "Gossip",
+  "topic": "Gossip",
+  "isPrivate": true,
+  "_id": "nRIWewnIFdGkVrZM",
+  "createdAt": "2018-06-11T21:48:26.471Z",
+  "updatedAt": "2018-06-11T21:48:26.471Z"
+}
+#+END_EXAMPLE
+
+user-003 can post messages to it
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-003
+POST http://localhost:4000/messages
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "room": "Gossip", "message": "blah, blah, blah"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "username": "user-003",
+  "message": "blah, blah, blah",
+  "room": "Gossip",
+  "_id": "VgdSvQjH9SSU3boz",
+  "createdAt": "2018-06-11T21:48:29.682Z",
+  "updatedAt": "2018-06-11T21:48:29.682Z"
+}
+#+END_EXAMPLE
+
+But user-004 cannot, must be invited first
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-004
+POST http://localhost:4000/messages
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "room": "Gossip", "message": "Chil"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "error": "Room is private"
+}
+#+END_EXAMPLE
+
+Then let's invite him
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-003
+POST http://localhost:4000/rooms/Gossip/users
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "username": "user-004"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "name": "Gossip",
+  "topic": "Gossip",
+  "isPrivate": true,
+  "_id": "nRIWewnIFdGkVrZM",
+  "createdAt": "2018-06-11T21:48:26.471Z",
+  "updatedAt": "2018-06-11T21:48:26.471Z"
+}
+#+END_EXAMPLE
+
 * Client Side
 ** User Stories
   - An user can enter anonymously
