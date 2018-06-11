@@ -197,6 +197,17 @@ app.get('/rooms/:room/messages', authenticate, (req, res) => {
   })
 })
 
+app.get('/messages', authenticate, (req, res) => {
+  rooms.find({$or: [{isPrivate: false}, {isPrivate: true, name: {$in: req.authenticatedUser.rooms}}]}, (err, rooms) => {
+    if (err) return res.status(500).end()
+    const accessibleRooms = rooms.map(({name}) => name)
+    messages.find({room: {$in: accessibleRooms}}).sort({createdAt: 1}).exec((err, messages) => {
+      if (err) return res.status(500).end()
+      res.status(200).json({messages})
+    })
+  })
+})
+
 app.get('/users', (req, res) => {
   users.find({}, (err, rooms) => {
     if (err) return res.status(500).end()

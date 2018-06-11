@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [29/56]
+* Server Side [31/53]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -83,15 +83,19 @@
   - [X] ~PUT /users/:user/preferences~
   - [X] ~GET /users/:user/preferences~
   - [X] ~PUT /users/:user/profile~
-  - [ ] ~GET /messages~ all messages in all rooms
+  - [X] ~GET /messages~ all messages in all available rooms
   - [ ] Parameters validation ???
   - [ ] Use emacs-request + org-mode to show interaction with the application
+  - [ ] Add ~Location~ header after login
+  - [X] Example application to show how things works and how socket works
   - [X] Final deploy with an alias so that the examples can be run
   - [ ] ???
-  - [ ] Socket channel ~notifications~
-  - [ ] ~GET /users/:user/notifications/unread~
-  - [ ] ~DELETE /users/:user/notifications/unread/:notification~
-  - [ ] ~GET /users/:user/notifications~
+  - [ ] ~DELETE /rooms/:room~ also remove all references in ~users~ if it's a private room
+  - [ ] Notifications
+    - [ ] Socket channel ~notifications~
+    - [ ] ~GET /users/:user/notifications/unread~
+    - [ ] ~DELETE /users/:user/notifications/unread/:notification~
+    - [ ] ~GET /users/:user/notifications~
   - [ ] Notify users when they are invited to a room
   - [ ] ~PUT /messages/:id~ to modify a message
   - [ ] ~DELETE /message/:id~ to delete a message
@@ -99,11 +103,8 @@
   - [ ] ~GET /messages?search={term}~ ordered
   - [ ] Tests
   - [ ] APIs documentation ???
-  - [ ] Add ~Location~ header after login
-  - [ ] ~DELETE /login/{id}~
   - [ ] Check for duplicates when create an anonymous username
   - [ ] ~GET /users/{token}/messages~
-  - [ ] Example application to show how things works and how socket works
   - [ ] Add global eslint
   - [ ] Run server side tests on Travis on deploy
   - [ ] Add a basic ReacJS application in ~/client~ after build copy in ~/public~
@@ -114,7 +115,7 @@
       no then put the instruction on ~README.md~ the students must be
       able to pull and rebase on upstream in case of another future or
       a bug fix.
-  - [ ] Emacs checking JSON syntax
+  - [ ] Emacs flycheck JSON syntax
 * Client Side
 ** User Stories
   - An user can enter anonymously
