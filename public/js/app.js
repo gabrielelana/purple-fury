@@ -43,6 +43,16 @@ function inviteUser(token, room, username, callback) {
     })
 }
 
+function updatePreferences(token, username, preferences, callback) {
+  superagent
+    .put('/users/' + username + '/preferences')
+    .send({token, preferences})
+    .end((err, res) => {
+      console.log('udpate-preferences', err, res)
+      callback(err, res.body.preferences)
+    })
+}
+
 function listOfRooms(token, callback) {
   superagent
     .get('/rooms?token=' + token)
@@ -118,6 +128,11 @@ $(() => {
 
   login('chiara', 'secret', (err, {token, socket}) => {
     if (err) return console.log(err)
+
+    updatePreferences(token, 'chiara', {strawberryCream: true}, (err, preferences) => {
+      if (err) return err
+      console.log('preferences', preferences)
+    })
 
     setTimeout(
       () => {

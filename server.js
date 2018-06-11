@@ -35,7 +35,13 @@ function login(credentials, users, callback) {
     } else {
       bcrypt.hash(credentials.password, saltRounds, function(err, hashedPassword) {
         if (err) return callback(err)
-        users.insert({username: credentials.username, password: hashedPassword, rooms: []}, (err, user) => {
+        const user = {
+          username: credentials.username,
+          password: hashedPassword,
+          rooms: [],
+          preferences: {},
+        }
+        users.insert(user, (err, user) => {
           if (err) return callback(err)
           console.log('created:', user)
           callback(null, user)
@@ -190,12 +196,32 @@ app.get('/rooms/:room/messages', authenticate, (req, res) => {
   })
 })
 
-app.get('/users', authenticate, (req, res) => {
+app.get('/users', (req, res) => {
   users.find({}, (err, rooms) => {
     if (err) return res.status(500).end()
     res.status(200).json({
       users: rooms.map(({_id, username}) => ({username, isConnected: sockets.has(_id)}))
     })
+  })
+})
+
+app.put('/users/:user/preferences', authenticate, (req, res) => {
+  // TOOD: validate body parameters `preferences`
+  users.findOne({$or: [{username: req.params.user}, {_id: req.params.user}]}, (err, user) => {
+    if (!user) return res.status(404).end()
+    if (req.authenticatedUser._id !== user._id) return res.status(401).end()
+    users.update({_id: user._id}, {$set: {preferences: req.body.preferences}}, {}, (err) => {
+      if (err) return res.status(500).end()
+      res.status(200).json(req.body.preferences)
+    })
+  })
+})
+
+app.get('/users/:user/preferences', authenticate, (req, res) => {
+  users.findOne({$or: [{username: req.params.user}, {_id: req.params.user}]}, (err, user) => {
+    if (!user) return res.status(404).end()
+    if (req.authenticatedUser._id !== user._id) return res.status(401).end()
+    res.status(200).json(user.preferences)
   })
 })
 

@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [26/56]
+* Server Side [28/57]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -80,10 +80,11 @@
   - [X] ~GET /users~ add ~connected: true/false~
   - [X] Socket channel ~users~
   - [X] ~GET /room/{name}/messages~ ordered
-  - [ ] ~PUT /users/:user/preferences~
-  - [ ] ~GET /users/:user/preferences~
+  - [X] ~PUT /users/:user/preferences~
+  - [X] ~GET /users/:user/preferences~
   - [ ] ~PUT /users/:user/profile~
   - [ ] ~GET /users/:user/profile~
+  - [ ] ~GET /messages~
   - [ ] Parameters validation ???
   - [ ] Use emacs-request + org-mode to show interaction with the application
   - [X] Final deploy with an alias so that the examples can be run
