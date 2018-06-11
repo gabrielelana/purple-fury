@@ -49,7 +49,7 @@
      - Retrospective
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
-* Server Side [23/54]
+* Server Side [24/54]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -78,7 +78,7 @@
   - [X] Remove the owner concept from a room
   - [X] Use ~room~ or ~user~ as parameter name when you need something like ~name|id~
   - [X] ~GET /users~ add ~connected: true/false~
-  - [ ] Socket channel ~users~
+  - [X] Socket channel ~users~
   - [ ] ~GET /room/{name}/messages~ ordered
   - [ ] ~PUT /users/:user/preferences~
   - [ ] ~GET /users/:user/preferences~

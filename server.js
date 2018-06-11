@@ -197,6 +197,9 @@ io.use((socket, next) => {
     let socketsForUser = sockets.get(token) || []
     socketsForUser.push(socket)
     sockets.set(token, socketsForUser)
+    if (socketsForUser.length === 1) {
+      io.emit('users', {username: user.username, event: 'user-is-online'})
+    }
     return next();
   })
 })
@@ -212,6 +215,15 @@ io.on('connection', socket => {
     let socketsForUser = sockets.get(token) || []
     socketsForUser = socketsForUser.filter(socketForUser => socketForUser.id !== socket.id)
     sockets.set(token, socketsForUser)
+    // TODO: consider to user username instead of _id
+    if (socketsForUser.length === 0) {
+      sockets.delete(token)
+      users.findOne({_id: token}, (err, user) => {
+        if (!err && user) {
+          io.emit('users', {username: user.username, event: 'user-went-offline'})
+        }
+      })
+    }
   })
 })
 

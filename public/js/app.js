@@ -57,7 +57,7 @@ function listOfUsers(token, callback) {
     .get('/users?token=' + token)
     .end((err, res) => {
       console.log('list-of-users', err, res)
-      callback(err, res.body.rooms)
+      callback(err, res.body.users)
     })
 }
 
@@ -92,6 +92,19 @@ $(() => {
     socket.on('messages', data => {
       $('#messages').append($('<li>').text(data.room + ':' + data.username + '> ' + data.message))
     })
+
+    socket.on('users', data => {
+      // user-is-online
+      // user-went-offline
+      // user-went-away
+      if (data.event === 'user-is-online') {
+        $('#messages').append($('<li>').text('*** ' + data.username + ' is online'))
+      } else if (data.event === 'user-went-offline') {
+        $('#messages').append($('<li>').text('*** ' + data.username + ' went offline'))
+      } else {
+        $('#messages').append($('<li>').text('*** ' + data.username + ' ???'))
+      }
+    })
   })
 
   login('chiara', 'secret', (err, {token, socket}) => {
@@ -111,4 +124,41 @@ $(() => {
     )
   })
 
+  setTimeout(
+    () => {
+      login('roberto', 'secret', (err, {token, socket}) => {
+        setTimeout(
+          () => {
+            socket.disconnect()
+            setTimeout(
+              () => {
+                listOfUsers(token, (err, users) => {
+                  if (err) return err
+                  console.log('users', users)
+                })
+                setTimeout(
+                  () => {
+                    login('roberto', 'secret', (err, {token, socket}) => {
+                      setTimeout(
+                        () => {
+                          listOfUsers(token, (err, users) => {
+                            if (err) return err
+                            console.log('users', users)
+                          })
+                        },
+                        1000
+                      )
+                    })
+                  },
+                  1000
+                )
+              }, 1000
+            )
+          },
+          1000
+        )
+      })
+    },
+    10000
+  )
 })
