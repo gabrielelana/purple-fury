@@ -126,7 +126,7 @@ app.post(
     // TODO: remove duplication of access to a room
     rooms.findOne({name: message.room}, (err, room) => {
       if (err) return res.status(500).end()
-      if (!room) return res.status(404).json('Room not found')
+      if (!room) return res.status(404).json({error: 'Room not found'})
       if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
       messages.insert(message, (err, message) => {
         if (err) return res.status(500).end()
