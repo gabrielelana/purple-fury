@@ -52,7 +52,7 @@ function login(credentials, users, callback) {
 }
 
 function credentials(credentials, _users, callback) {
-  if (credentials.username || credentials.password) {
+  if (credentials.username && credentials.password) {
     return callback(null, credentials)
   }
   require('crypto').randomBytes(2, (err, buffer) => {
