@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const server = require('http').Server(app)
+const cors = require('cors')
 const io = require('socket.io')(server)
 const { check, body, validationResult } = require('express-validator/check');
 
@@ -17,6 +18,7 @@ var sockets = new Map()
 app.use(express.static('public'))
 app.use(require('body-parser').json())
 app.use(require('cookie-parser')())
+app.use(cors())
 
 function login(credentials, users, callback) {
   const saltRounds = 5
@@ -296,6 +298,8 @@ app.put(
       })
     })
   })
+
+io.origins('*:*')
 
 io.use((socket, next) => {
   const token = socket.handshake.query.token;
