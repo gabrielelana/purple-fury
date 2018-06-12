@@ -11,14 +11,22 @@
      - Setup Trello to keep track of the project
    - From 12:30 to 13:30
      - Deploy a “Walking Skeleton” in production
-       - Fork the project ???
+       - Fork the project
        - Create an account on https://zeit.co
        - Install NodeJS 8.11.2
        - Install now with ~$ npm install -g now~ and go through authentication process
        - From the project root run  ~$ now~ and be amazed that everything works
      - Look at the user stories
+     - Look at the server APIs
+     - How to pull features/fixes from upstream
+       - ~git remote add upstream https://github.com/gabrielelana/purple-fury.git~
+       - ~git fetch upstream~ update your local repository with the remote code
+       - ~git checkout master~ make sure you are on your master
+       - ~git merge upstream/master~ merge changes of remote repository with your local master
+       - If you were on a feature branch (ex. ~US-001~) then probably you should rebase on master
+         - ~git checkout US-001~ go back on your feature branch
+         - ~git rebase master~ rebase on master
      - Setup Trello to keep track of the user stories
-     - Look at the server APIs ???
 ** Tuesday
    - 9:30 create the teams with Pietro, look at the user stories and explain what we are going to do
      - 4 iterations of 4 hours each: Tuesday morning, Wednesday morning, Thursday morning, Thursday evening
