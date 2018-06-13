@@ -10,6 +10,7 @@ const users = new Database({inMemoryOnly: true, timestampData: true})
 const messages = new Database({inMemoryOnly: true, timestampData: true})
 const rooms = new Database({inMemoryOnly: true, timestampData: true})
 
+const moment = require('moment')
 const bcrypt = require('bcrypt')
 const util = require('util')
 
@@ -348,3 +349,14 @@ rooms.insert({name: 'main', topic: 'main', isPrivate: false}, (err, _room) => {
     console.log('The server is running: http://localhost:4000')
   })
 })
+
+setInterval(
+  () => {
+    messages.remove({createdAt: {$lt: moment().subtract(30, 'minutes')}}, {multi: true}, (err, numRemoved) => {
+      if (!err) {
+        console.log(`removed ${numRemoved} old messages`)
+      }
+    })
+  },
+  30000
+)
