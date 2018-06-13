@@ -128,15 +128,15 @@ Accept: application/json
 #+RESULTS:
 #+BEGIN_EXAMPLE
 {
-  "username": "user-EEBC",
-  "password": "$2b$05$P8VO3S/SK./FBmSCqmFxKe.QuJN4WVewj3gbaT8Zdkpev5G243pRG",
+  "username": "user-0798",
+  "password": "$2b$05$zOO/jVkp7w5jad9twShZT.7Ywtc5WDxqrT2fNMzJh3grsTRDR.Zdq",
   "rooms": [],
   "preferences": {},
   "profile": {},
-  "_id": "M7W1ohVYULE789W0",
-  "createdAt": "2018-06-11T21:06:32.768Z",
-  "updatedAt": "2018-06-11T21:06:32.768Z",
-  "token": "M7W1ohVYULE789W0"
+  "_id": "EitaKSrz2jxnZmeu",
+  "createdAt": "2018-06-13T08:19:09.809Z",
+  "updatedAt": "2018-06-13T08:19:09.809Z",
+  "token": "EitaKSrz2jxnZmeu"
 }
 #+END_EXAMPLE
 
@@ -232,9 +232,9 @@ Content-Type: application/json
   "username": "user-002",
   "message": "Blessed be the fruit",
   "room": "main",
-  "_id": "YuLhxJqvXPB9h2WC",
-  "createdAt": "2018-06-11T21:15:38.170Z",
-  "updatedAt": "2018-06-11T21:15:38.170Z"
+  "_id": "bShGKnNki10AkUj0",
+  "createdAt": "2018-06-13T08:28:01.100Z",
+  "updatedAt": "2018-06-13T08:28:01.100Z"
 }
 #+END_EXAMPLE
 
@@ -271,9 +271,9 @@ Content-Type: application/json
   "name": "ReactJS",
   "topic": "Everything about ReactJS",
   "isPrivate": false,
-  "_id": "4fPo9FKJXmLgATFF",
-  "createdAt": "2018-06-11T21:33:11.600Z",
-  "updatedAt": "2018-06-11T21:33:11.600Z"
+  "_id": "zaRSbHnzLlEvW1Aw",
+  "createdAt": "2018-06-13T08:22:09.974Z",
+  "updatedAt": "2018-06-13T08:22:09.974Z"
 }
 #+END_EXAMPLE
 
@@ -292,9 +292,9 @@ Content-Type: application/json
   "username": "user-002",
   "message": "ReactJS is cool",
   "room": "ReactJS",
-  "_id": "ZSWV2iIEcI4lBkzw",
-  "createdAt": "2018-06-11T21:36:22.379Z",
-  "updatedAt": "2018-06-11T21:36:22.379Z"
+  "_id": "COkAhm8gw9lBFj20",
+  "createdAt": "2018-06-13T08:22:12.813Z",
+  "updatedAt": "2018-06-13T08:22:12.813Z"
 }
 #+END_EXAMPLE
 
@@ -413,6 +413,65 @@ Content-Type: application/json
   "updatedAt": "2018-06-11T21:48:26.471Z"
 }
 #+END_EXAMPLE
+
+*** Get all messages posted to all accessible rooms
+
+Using the authentication token we get all the messages posted to all accessible rooms
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+GET http://localhost:4000/messages?token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "messages": [
+    {
+      "username": "user-002",
+      "message": "ReactJS is cool",
+      "room": "ReactJS",
+      "_id": "COkAhm8gw9lBFj20",
+      "createdAt": "2018-06-13T08:22:12.813Z",
+      "updatedAt": "2018-06-13T08:22:12.813Z"
+    },
+    {
+      "username": "user-002",
+      "message": "Blessed be the fruit",
+      "room": "main",
+      "_id": "bShGKnNki10AkUj0",
+      "createdAt": "2018-06-13T08:28:01.100Z",
+      "updatedAt": "2018-06-13T08:28:01.100Z"
+    }
+  ]
+}
+#+END_EXAMPLE
+
+*** Get all messages posted to a specific room
+
+Using the authentication token we get all the messages posted to a specific room
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+GET http://localhost:4000/rooms/ReactJS/messages?token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "messages": [
+    {
+      "username": "user-002",
+      "message": "ReactJS is cool",
+      "room": "ReactJS",
+      "_id": "COkAhm8gw9lBFj20",
+      "createdAt": "2018-06-13T08:22:12.813Z",
+      "updatedAt": "2018-06-13T08:22:12.813Z"
+    }
+  ]
+}
+#+END_EXAMPLE
+
 
 * Client Side
 ** User Stories
