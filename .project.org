@@ -472,6 +472,107 @@ Content-Type: application/json
 }
 #+END_EXAMPLE
 
+*** User profile
+
+User profile is something to be considered public, something like: an introduction message, the email, the avatar, ecc...
+
+#+NAME: login-005
+#+BEGIN_SRC http :pretty :select .token :results value silent
+POST http://localhost:4000/login
+Accept: application/json
+Content-Type: application/json
+
+{"username": "user-005", "password": "secret"}
+#+END_SRC
+
+As you can see the profile is part of the user's representation
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-005
+GET http://localhost:4000/users?token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "users": [
+    {
+      "username": "user-004",
+      "profile": {},
+      "isConnected": false
+    },
+    {
+      "username": "user-0798",
+      "profile": {},
+      "isConnected": false
+    },
+    {
+      "username": "user-002",
+      "profile": {},
+      "isConnected": false
+    },
+    {
+      "username": "user-005",
+      "profile": {},
+      "isConnected": false
+    }
+  ]
+}
+#+END_EXAMPLE
+
+An user can change his profile
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-005
+PUT http://localhost:4000/users/user-005/profile
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "profile": {"introduction": "I'm a nice guy, nice to meet you all ;-)"}}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "introduction": "I'm a nice guy, nice to meet you all ;-)"
+}
+#+END_EXAMPLE
+
+Everyone can see my profile
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-005
+GET http://localhost:4000/users?token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "users": [
+    {
+      "username": "user-004",
+      "profile": {},
+      "isConnected": false
+    },
+    {
+      "username": "user-0798",
+      "profile": {},
+      "isConnected": false
+    },
+    {
+      "username": "user-002",
+      "profile": {},
+      "isConnected": false
+    },
+    {
+      "username": "user-005",
+      "profile": {
+        "introduction": "I'm a nice guy, nice to meet you all ;-)"
+      },
+      "isConnected": false
+    }
+  ]
+}
+#+END_EXAMPLE
+
 
 * Client Side
 ** User Stories
