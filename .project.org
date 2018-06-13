@@ -573,6 +573,60 @@ Content-Type: application/json
 }
 #+END_EXAMPLE
 
+*** User preferences
+
+User preferences are something to be considered private, it's a kind of storage used to remember things about the user (ex. preferred topic, last message read per room, ...)
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+GET http://localhost:4000/users/user-002/preferences?token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{}
+#+END_EXAMPLE
+
+We can update them
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+PUT http://localhost:4000/users/user-002/preferences
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "preferences": {"topics": ["JS", "ReactJS", "HTML5", "CSS3"]}}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "topics": [
+    "JS",
+    "ReactJS",
+    "HTML5",
+    "CSS3"
+  ]
+}
+#+END_EXAMPLE
+
+And get it back
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+GET http://localhost:4000/users/user-002/preferences?token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "topics": [
+    "JS",
+    "ReactJS",
+    "HTML5",
+    "CSS3"
+  ]
+}
+#+END_EXAMPLE
+
 
 * Client Side
 ** User Stories
