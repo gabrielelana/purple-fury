@@ -117,11 +117,11 @@ $(() => {
       // user-went-offline
       // user-went-away
       if (data.event === 'user-is-online') {
-        $('#messages').append($('<li>').text('*** ' + data.username + ' is online'))
+        $('#messages').append($('<li>').text('*** ' + data.user.username + ' is online'))
       } else if (data.event === 'user-went-offline') {
-        $('#messages').append($('<li>').text('*** ' + data.username + ' went offline'))
+        $('#messages').append($('<li>').text('*** ' + data.user.username + ' went offline'))
       } else {
-        $('#messages').append($('<li>').text('*** ' + data.username + ' ???'))
+        $('#messages').append($('<li>').text('*** ' + data.user.username + ' ???'))
       }
     })
   })

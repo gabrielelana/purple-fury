@@ -315,7 +315,14 @@ io.use((socket, next) => {
     socketsForUser.push(socket)
     sockets.set(token, socketsForUser)
     if (socketsForUser.length === 1) {
-      io.emit('users', {username: user.username, event: 'user-is-online'})
+      io.emit('users', {
+        user: {
+          username: user.username,
+          profile: user.profile,
+          isConnected: true,
+        },
+        event: 'user-is-online'
+      })
     }
     return next();
   })
@@ -337,7 +344,14 @@ io.on('connection', socket => {
       sockets.delete(token)
       users.findOne({_id: token}, (err, user) => {
         if (!err && user) {
-          io.emit('users', {username: user.username, event: 'user-went-offline'})
+          io.emit('users', {
+            user: {
+              username: user.username,
+              profile: user.profile,
+              isConnected: true,
+            },
+            event: 'user-went-offline'
+          })
         }
       })
     }

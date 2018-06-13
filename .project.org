@@ -98,6 +98,7 @@
   - [X] Example application to show how things works and how socket works
   - [X] Final deploy with an alias so that the examples can be run
   - [X] Periodically remove old messages
+  - [X] Push user representation on users channel
   - [ ] Check for duplicates when create an anonymous username
   - [ ] ~DELETE /rooms/:room~ also remove all references in ~users~ if it's a private room
   - [ ] Notifications
