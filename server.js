@@ -360,7 +360,7 @@ io.on('connection', socket => {
             user: {
               username: user.username,
               profile: user.profile,
-              isConnected: true,
+              isConnected: false,
             },
             event: 'user-went-offline'
           })
