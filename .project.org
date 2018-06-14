@@ -107,18 +107,18 @@
     - [ ] ~DELETE /users/:user/notifications/unread/:notification~
     - [ ] ~GET /users/:user/notifications~
   - [ ] Notify users when they are invited to a room
+  - [ ] Check for duplicates when create an anonymous username
+  - [ ] ~DELETE /rooms/:room~ also remove all references in ~users~ if it's a private room
   - [ ] ~PUT /messages/:id~ to modify a message
   - [ ] ~DELETE /message/:id~ to delete a message
   - [ ] Notify users when an message has been modified or deleted
-  - [ ] ~GET /messages?search={term}~ ordered
   - [ ] Tests
-  - [ ] ~GET /users/{token}/messages~
   - [ ] Add global eslint
+  - [ ] Emacs flycheck JSON syntax
   - [ ] Run server side tests on Travis on deploy
   - [ ] Add a basic ReacJS application in ~/client~ after build copy in ~/public~
   - [ ] Run client side tests on Travis on deploy
   - [ ] Create final repository ~codemaster-2018~ with an appropriate ~README.md~
-  - [ ] Emacs flycheck JSON syntax
 ** APIs
 *** Login anonymously
 
@@ -672,6 +672,203 @@ Content-Type: application/json
   "_id": "QBVit89u52i4QCRU",
   "createdAt": "2018-06-14T07:37:53.803Z",
   "updatedAt": "2018-06-14T07:37:53.803Z"
+}
+#+END_EXAMPLE
+
+*** Search messages
+
+First we login
+#+NAME: login-006
+#+BEGIN_SRC http :pretty :select .token :results value silent
+POST http://localhost:4000/login
+Accept: application/json
+Content-Type: application/json
+
+{"username": "user-006", "password": "secret"}
+#+END_SRC
+
+Then we create a room
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-006
+POST http://localhost:4000/rooms
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "name": "room-006", "topic": "Nothing interesting"}
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "name": "room-006",
+  "topic": "Nothing interesting",
+  "isPrivate": false,
+  "_id": "2SanfhaICGl3jztT",
+  "createdAt": "2018-06-14T09:02:43.741Z",
+  "updatedAt": "2018-06-14T09:02:43.741Z"
+}
+#+END_EXAMPLE
+
+Then post a couple of messages
+#+BEGIN_SRC http :pretty :var token=login-006 :results silent
+POST http://localhost:4000/messages
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "message": "hello world", "room": "room-006"}
+#+END_SRC
+
+#+BEGIN_SRC http :pretty :var token=login-006 :results silent
+POST http://localhost:4000/messages
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "message": "hello there", "room": "room-006"}
+#+END_SRC
+
+#+BEGIN_SRC http :pretty :var token=login-006 :results silent
+POST http://localhost:4000/messages
+Accept: application/json
+Content-Type: application/json
+
+{"token": "${token}", "message": "greetings", "room": "room-006"}
+#+END_SRC
+
+Then we can get all the messages
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-006
+GET http://localhost:4000/messages?token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "messages": [
+    {
+      "username": "user-006",
+      "message": "hello world",
+      "room": "room-006",
+      "_id": "sNzMtFxGa7ypsSDk",
+      "createdAt": "2018-06-14T09:02:47.360Z",
+      "updatedAt": "2018-06-14T09:02:47.360Z"
+    },
+    {
+      "username": "user-006",
+      "message": "hello there",
+      "room": "room-006",
+      "_id": "YwlvICLS8xCEWqWa",
+      "createdAt": "2018-06-14T09:02:49.189Z",
+      "updatedAt": "2018-06-14T09:02:49.189Z"
+    },
+    {
+      "username": "user-006",
+      "message": "greetings",
+      "room": "room-006",
+      "_id": "u6WrcF41eMiBEoR5",
+      "createdAt": "2018-06-14T09:02:53.180Z",
+      "updatedAt": "2018-06-14T09:02:53.180Z"
+    }
+  ]
+}
+#+END_EXAMPLE
+
+All messages that contains the world ~hello~
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-006
+GET http://localhost:4000/messages?search=hello&token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "messages": [
+    {
+      "username": "user-006",
+      "message": "hello world",
+      "room": "room-006",
+      "_id": "sNzMtFxGa7ypsSDk",
+      "createdAt": "2018-06-14T09:02:47.360Z",
+      "updatedAt": "2018-06-14T09:02:47.360Z"
+    },
+    {
+      "username": "user-006",
+      "message": "hello there",
+      "room": "room-006",
+      "_id": "YwlvICLS8xCEWqWa",
+      "createdAt": "2018-06-14T09:02:49.189Z",
+      "updatedAt": "2018-06-14T09:02:49.189Z"
+    }
+  ]
+}
+#+END_EXAMPLE
+
+All messages that contains the world ~hello~ and ~world~
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-006
+GET http://localhost:4000/messages?search=hello%2Bworld&token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "messages": [
+    {
+      "username": "user-006",
+      "message": "hello world",
+      "room": "room-006",
+      "_id": "sNzMtFxGa7ypsSDk",
+      "createdAt": "2018-06-14T09:02:47.360Z",
+      "updatedAt": "2018-06-14T09:02:47.360Z"
+    }
+  ]
+}
+#+END_EXAMPLE
+
+All messages that contains the world ~greetings~
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-006
+GET http://localhost:4000/messages?search=greetings&token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "messages": [
+    {
+      "username": "user-006",
+      "message": "greetings",
+      "room": "room-006",
+      "_id": "u6WrcF41eMiBEoR5",
+      "createdAt": "2018-06-14T09:02:53.180Z",
+      "updatedAt": "2018-06-14T09:02:53.180Z"
+    }
+  ]
+}
+#+END_EXAMPLE
+
+Restricting the search to a single room
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login-006
+GET http://localhost:4000/rooms/room-006/messages?search=greetings&token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "messages": [
+    {
+      "username": "user-006",
+      "message": "greetings",
+      "room": "room-006",
+      "_id": "u6WrcF41eMiBEoR5",
+      "createdAt": "2018-06-14T09:02:53.180Z",
+      "updatedAt": "2018-06-14T09:02:53.180Z"
+    }
+  ]
 }
 #+END_EXAMPLE
 
