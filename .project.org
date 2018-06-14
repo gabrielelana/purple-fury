@@ -629,6 +629,52 @@ Content-Type: application/json
 }
 #+END_EXAMPLE
 
+*** Get all accessible rooms
+
+With an authentication token we can obtain the list of all available
+rooms for the authenticated user, this means that if a room is private
+and the current user doesn't have access to it, that room is not
+present in the list
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+GET http://localhost:4000/rooms?token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "rooms": [
+    {
+      "name": "main",
+      "topic": "main",
+      "isPrivate": false
+    }
+  ]
+}
+#+END_EXAMPLE
+
+*** Get a single room
+
+With an authentication token we can obtain the detail of a single room given its name
+#+BEGIN_SRC http :pretty :wrap EXAMPLE :var token=login
+GET http://localhost:4000/rooms/main?token=${token}
+Accept: application/json
+Content-Type: application/json
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+{
+  "name": "main",
+  "topic": "main",
+  "isPrivate": false,
+  "_id": "QBVit89u52i4QCRU",
+  "createdAt": "2018-06-14T07:37:53.803Z",
+  "updatedAt": "2018-06-14T07:37:53.803Z"
+}
+#+END_EXAMPLE
+
 
 * Client Side
 ** User Stories
