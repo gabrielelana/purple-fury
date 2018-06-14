@@ -117,7 +117,7 @@ app.post(
   authenticate,
   [
     body('message').isString().isLength({min: 1}),
-    body('room').optional().isAlphanumeric().isLength({min: 3}),
+    body('room').optional().matches(/[-_a-zA-Z0-9.]+/).isLength({min: 3}),
     validate
   ],
   (req, res) => {
