@@ -229,7 +229,12 @@ app.get('/rooms/:room/messages', authenticate, (req, res) => {
     if (err) return res.status(500).end()
     if (!room) return res.status(404).end()
     if (room.isPrivate && !req.authenticatedUser.rooms.includes(room.name)) return res.status(401).json({error: 'Room is private'})
-    messages.find({room: room.name}).sort({createdAt: 1}).exec((err, messages) => {
+    const allMessagesInRoom = {room: room.name}
+    const matchingMessages = (req.query.search) ?
+          {$and: req.query.search.split('+').map(term => ({message: new RegExp(`\\b${term}\\b`)}))} :
+          {}
+    const wantedMessages = {$and: [allMessagesInRoom, matchingMessages]}
+    messages.find(wantedMessages).sort({createdAt: 1}).exec((err, messages) => {
       if (err) return res.status(500).end()
       res.status(200).json({messages})
     })
@@ -237,10 +242,17 @@ app.get('/rooms/:room/messages', authenticate, (req, res) => {
 })
 
 app.get('/messages', authenticate, (req, res) => {
-  rooms.find({$or: [{isPrivate: false}, {isPrivate: true, name: {$in: req.authenticatedUser.rooms}}]}, (err, rooms) => {
+  const accessibleRooms = {
+    $or: [{isPrivate: false}, {isPrivate: true, name: {$in: req.authenticatedUser.rooms}}]
+  }
+  rooms.find(accessibleRooms, (err, rooms) => {
     if (err) return res.status(500).end()
-    const accessibleRooms = rooms.map(({name}) => name)
-    messages.find({room: {$in: accessibleRooms}}).sort({createdAt: 1}).exec((err, messages) => {
+    const allMessages = {room: {$in: rooms.map(({name}) => name)}}
+    const matchingMessages = (req.query.search) ?
+          {$and: req.query.search.split('+').map(term => ({message: new RegExp(`\\b${term}\\b`)}))} :
+          {}
+    const wantedMessages = {$and: [allMessages, matchingMessages]}
+    messages.find(wantedMessages).sort({createdAt: 1}).exec((err, messages) => {
       if (err) return res.status(500).end()
       res.status(200).json({messages})
     })

@@ -58,7 +58,7 @@
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
 * Server Side
-** User Stories [34/50]
+** User Stories [36/51]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -99,8 +99,8 @@
   - [X] Final deploy with an alias so that the examples can be run
   - [X] Periodically remove old messages
   - [X] Push user representation on users channel
-  - [ ] Check for duplicates when create an anonymous username
-  - [ ] ~DELETE /rooms/:room~ also remove all references in ~users~ if it's a private room
+  - [X] ~GET /messages?search={term}~ ordered
+  - [ ] ~GET /users/{token}/messages~
   - [ ] Notifications
     - [ ] Socket channel ~notifications~
     - [ ] ~GET /users/:user/notifications/unread~
