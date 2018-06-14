@@ -1,4 +1,6 @@
-function login(username, password, callback) {
+/* globals superagent, io, $ */
+
+function login (username, password, callback) {
   superagent
     .post('/login')
     .send({username, password})
@@ -9,12 +11,12 @@ function login(username, password, callback) {
         const socket = io({query: {token}})
         return callback(null, {token, socket})
       }
-      return callback('Unable to login')
+      return callback(new Error('Unable to login'))
     })
 }
 
-function createRoom(token, name, topic, isPrivate, callback) {
-    superagent
+function createRoom (token, name, topic, isPrivate, callback) {
+  superagent
     .post('/rooms')
     .send({token, name, topic, isPrivate})
     .end((err, res) => {
@@ -23,7 +25,7 @@ function createRoom(token, name, topic, isPrivate, callback) {
     })
 }
 
-function postMessage(token, room, message, callback) {
+function postMessage (token, room, message, callback) {
   superagent
     .post('/messages')
     .send({token, room, message})
@@ -33,7 +35,7 @@ function postMessage(token, room, message, callback) {
     })
 }
 
-function inviteUser(token, room, username, callback) {
+function inviteUser (token, room, username, callback) {
   superagent
     .post('/rooms/' + room + '/users')
     .send({token, username})
@@ -43,7 +45,7 @@ function inviteUser(token, room, username, callback) {
     })
 }
 
-function updatePreferences(token, username, preferences, callback) {
+function updatePreferences (token, username, preferences, callback) {
   superagent
     .put('/users/' + username + '/preferences')
     .send({token, preferences})
@@ -53,7 +55,7 @@ function updatePreferences(token, username, preferences, callback) {
     })
 }
 
-function listOfRooms(token, callback) {
+function listOfRooms (token, callback) {
   superagent
     .get('/rooms?token=' + token)
     .end((err, res) => {
@@ -62,7 +64,7 @@ function listOfRooms(token, callback) {
     })
 }
 
-function listOfUsers(token, callback) {
+function listOfUsers (token, callback) {
   superagent
     .get('/users?token=' + token)
     .end((err, res) => {
@@ -71,7 +73,7 @@ function listOfUsers(token, callback) {
     })
 }
 
-function listOfMessages(token, room, callback) {
+function listOfMessages (token, room, callback) {
   superagent
     .get('/rooms/' + room + '/messages?token=' + token)
     .end((err, res) => {
@@ -80,9 +82,7 @@ function listOfMessages(token, room, callback) {
     })
 }
 
-
 $(() => {
-
   login('gabriele', 'secret', (err, {token, socket}) => {
     if (err) return console.log(err)
 
@@ -103,7 +103,7 @@ $(() => {
     $('form').submit(() => {
       const message = $('#m').val()
       postMessage(token, 'main', message, (err) => {
-        $('#m').val('')
+        if (!err) $('#m').val('')
       })
       return false
     })
@@ -151,6 +151,7 @@ $(() => {
   setTimeout(
     () => {
       login('roberto', 'secret', (err, {token, socket}) => {
+        if (err) return
         setTimeout(
           () => {
             socket.disconnect()
@@ -163,6 +164,7 @@ $(() => {
                 setTimeout(
                   () => {
                     login('roberto', 'secret', (err, {token, socket}) => {
+                      if (err) return
                       setTimeout(
                         () => {
                           listOfUsers(token, (err, users) => {
