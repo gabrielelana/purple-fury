@@ -29,10 +29,8 @@ function login (credentials, users, callback) {
       bcrypt.compare(credentials.password, user.password, (err, correctPassword) => {
         if (err) return callback(err)
         if (correctPassword) {
-          console.log('found:', user)
           return callback(null, user)
         }
-        console.log('wrong password')
         return callback(new Error('Wrong password'))
       })
     } else {
@@ -47,7 +45,6 @@ function login (credentials, users, callback) {
         }
         users.insert(user, (err, user) => {
           if (err) return callback(err)
-          console.log('created:', user)
           callback(null, user)
         })
       })
@@ -387,11 +384,7 @@ rooms.insert({name: 'main', topic: 'main', isPrivate: false}, (err, _room) => {
 
 setInterval(
   () => {
-    messages.remove({createdAt: {$lt: moment().subtract(30, 'minutes')}}, {multi: true}, (err, numRemoved) => {
-      if (!err) {
-        console.log(`removed ${numRemoved} old messages`)
-      }
-    })
+    messages.remove({createdAt: {$lt: moment().subtract(30, 'minutes')}}, {multi: true})
   },
   30000
 )
