@@ -58,7 +58,7 @@
    - From 12:30 to 13:30
      - Closing remarks and considerations: what to expect next
 * Server Side
-** User Stories [36/51]
+** User Stories [37/51]
   - [X] Deploy hello world application on now
   - [X] Basic chat application with socket.io
   - [X] Add ~nodemon~ to restart the server on change
@@ -113,7 +113,7 @@
   - [ ] ~DELETE /message/:id~ to delete a message
   - [ ] Notify users when an message has been modified or deleted
   - [ ] Tests
-  - [ ] Add global eslint
+  - [X] Add global eslint
   - [ ] Emacs flycheck JSON syntax
   - [ ] Run server side tests on Travis on deploy
   - [ ] Add a basic ReacJS application in ~/client~ after build copy in ~/public~
